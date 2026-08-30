@@ -1,0 +1,403 @@
+{
+  "seed": 20260830,
+  "population_size": 46,
+  "sample_size": 20,
+  "selected_traces": [
+    {
+      "trace_id": "gen_Q6",
+      "source": "generation_dump",
+      "question_id": "Q6",
+      "question": "What is the default `chunk_size_mb` for `BatchUploader.upload()` v3?",
+      "known_answer": "8",
+      "retrieved_chunk_ids": [
+        "v3__batch-uploader-upload__structure_aware__1",
+        "v3__batch-uploader-upload__structure_aware__0",
+        "v3__batch-uploader-upload__structure_aware__3",
+        "v3__batch-uploader-upload__structure_aware__2",
+        "v3__rate-limiter-configure__structure_aware__2"
+      ],
+      "answer": "The default value for `chunk_size_mb` is **8 MB**. [chunk_id=v3__batch-uploader-upload__structure_aware__1]",
+      "hit": true,
+      "has_generation": true
+    },
+    {
+      "trace_id": "gen_Q7",
+      "source": "generation_dump",
+      "question_id": "Q7",
+      "question": "What is the default `ttl_seconds` for `AuthManager.refresh_token()` v3, and what exception is raised when the refresh token has expired?",
+      "known_answer": "3600 seconds; raises TokenExpiredError.",
+      "retrieved_chunk_ids": [
+        "v3__auth-manager-refresh-token__structure_aware__0",
+        "v3__auth-manager-refresh-token__structure_aware__3",
+        "v3__auth-manager-refresh-token__structure_aware__2",
+        "v3__auth-manager-refresh-token__structure_aware__1",
+        "v3__client-connect__structure_aware__1"
+      ],
+      "answer": "The default `ttl_seconds` is **3600** [v3__auth-manager-refresh-token__structure_aware__1].  \nWhen the refresh token has expired, `TokenExpiredError` is raised [v3__auth-manager-refresh-token__structure_aware__3].",
+      "hit": true,
+      "has_generation": true
+    },
+    {
+      "trace_id": "gen_R1",
+      "source": "generation_dump",
+      "question_id": "R1",
+      "question": "What is the rate limit (requests per minute) for the /v3/analytics/export endpoint?",
+      "known_answer": "No analytics/export endpoint is documented anywhere in the 8 ingested pages.",
+      "retrieved_chunk_ids": [
+        "v2__rate-limiter-configure__structure_aware__1",
+        "v3__rate-limiter-configure__structure_aware__1",
+        "v3__rate-limiter-configure__structure_aware__3",
+        "v3__rate-limiter-configure__structure_aware__2",
+        "v2__rate-limiter-configure__structure_aware__2"
+      ],
+      "answer": "NOT_IN_CORPUS: This is not documented in the provided SDK reference pages.",
+      "hit": false,
+      "has_generation": true
+    },
+    {
+      "trace_id": "gen_R2",
+      "source": "generation_dump",
+      "question_id": "R2",
+      "question": "What error code does Client.send() return when the connection pool is exhausted?",
+      "known_answer": "Client.send()'s Errors section only documents PayloadValidationError and DeliveryTimeoutError -- no connection-pool error exists in the corpus.",
+      "retrieved_chunk_ids": [
+        "v2__client-send__structure_aware__0",
+        "v3__client-send__structure_aware__1",
+        "v2__client-send__structure_aware__3",
+        "v3__client-send__structure_aware__4",
+        "v3__client-connect__structure_aware__0"
+      ],
+      "answer": "NOT_IN_CORPUS: This is not documented in the provided SDK reference pages.",
+      "hit": false,
+      "has_generation": true
+    },
+    {
+      "trace_id": "search_rec_Q1",
+      "source": "search_dump_recursive",
+      "question_id": "Q1",
+      "question": "What is the default value and type of `retry_backoff_ms` on `Client.send()`?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v2__client-send__recursive__0",
+        "v2__client-send__recursive__1",
+        "v3__client-send__recursive__2",
+        "v3__client-send__recursive__1",
+        "v3__auth-manager-refresh-token__recursive__1"
+      ],
+      "retrieval_distances": [
+        0.7825499773025513,
+        0.8001024723052979,
+        0.8419663906097412,
+        0.9923858642578125,
+        1.1254311800003052
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_rec_Q4",
+      "source": "search_dump_recursive",
+      "question_id": "Q4",
+      "question": "What is the default `window_ms` value in `RateLimiter.configure()` v3?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v2__rate-limiter-configure__recursive__1",
+        "v2__rate-limiter-configure__recursive__0",
+        "v3__rate-limiter-configure__recursive__1",
+        "v3__rate-limiter-configure__recursive__0",
+        "v3__batch-uploader-upload__recursive__1"
+      ],
+      "retrieval_distances": [
+        0.9071837067604065,
+        0.9279283881187439,
+        0.9321379065513611,
+        1.010667324066162,
+        1.6190214157104492
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_rec_Q6",
+      "source": "search_dump_recursive",
+      "question_id": "Q6",
+      "question": "What is the default `chunk_size_mb` for `BatchUploader.upload()` v3?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v3__batch-uploader-upload__recursive__0",
+        "v3__batch-uploader-upload__recursive__2",
+        "v3__batch-uploader-upload__recursive__1",
+        "v2__rate-limiter-configure__recursive__0",
+        "v2__rate-limiter-configure__recursive__1"
+      ],
+      "retrieval_distances": [
+        0.9965552091598511,
+        1.0167983770370483,
+        1.233636736869812,
+        1.3522040843963623,
+        1.3559069633483887
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_rec_Q8",
+      "source": "search_dump_recursive",
+      "question_id": "Q8",
+      "question": "Does `RateLimiter.configure()` v2 support a `burst` parameter?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v3__rate-limiter-configure__recursive__0",
+        "v3__rate-limiter-configure__recursive__1",
+        "v2__rate-limiter-configure__recursive__0",
+        "v2__rate-limiter-configure__recursive__1",
+        "v3__batch-uploader-upload__recursive__1"
+      ],
+      "retrieval_distances": [
+        0.6818059682846069,
+        0.7135544419288635,
+        0.7796726226806641,
+        0.8730151653289795,
+        1.34456467628479
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_sa_Q1",
+      "source": "search_dump_structure_aware",
+      "question_id": "Q1",
+      "question": "What is the default value and type of `retry_backoff_ms` on `Client.send()`?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v2__client-send__structure_aware__3",
+        "v3__client-send__structure_aware__4",
+        "v3__client-send__structure_aware__1",
+        "v2__client-send__structure_aware__1",
+        "v3__client-send__structure_aware__2"
+      ],
+      "retrieval_distances": [
+        0.7157086133956909,
+        0.7157086133956909,
+        0.7200400829315186,
+        0.8317111730575562,
+        0.8866654634475708
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_sa_Q4",
+      "source": "search_dump_structure_aware",
+      "question_id": "Q4",
+      "question": "What is the default `window_ms` value in `RateLimiter.configure()` v3?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v2__rate-limiter-configure__structure_aware__2",
+        "v3__rate-limiter-configure__structure_aware__2",
+        "v3__rate-limiter-configure__structure_aware__1",
+        "v2__rate-limiter-configure__structure_aware__1",
+        "v2__rate-limiter-configure__structure_aware__3"
+      ],
+      "retrieval_distances": [
+        0.8626684546470642,
+        0.8654847741127014,
+        0.888650119304657,
+        0.9095777273178101,
+        0.9259141087532043
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_sa_Q5",
+      "source": "search_dump_structure_aware",
+      "question_id": "Q5",
+      "question": "In the Webhooks.subscribe() v3 example, which HTTP header carries the HMAC signature on Nimbus's callback request?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v3__webhooks-subscribe__structure_aware__2",
+        "v3__webhooks-subscribe__structure_aware__1",
+        "v3__webhooks-subscribe__structure_aware__0",
+        "v3__webhooks-subscribe__structure_aware__3",
+        "v3__client-send__structure_aware__0"
+      ],
+      "retrieval_distances": [
+        0.5989278554916382,
+        0.7472217082977295,
+        0.7537868618965149,
+        0.7665690183639526,
+        1.1826969385147095
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_sa_Q7",
+      "source": "search_dump_structure_aware",
+      "question_id": "Q7",
+      "question": "What is the default `ttl_seconds` for `AuthManager.refresh_token()` v3, and what exception is raised when the refresh token has expired?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v3__auth-manager-refresh-token__structure_aware__0",
+        "v3__auth-manager-refresh-token__structure_aware__3",
+        "v3__auth-manager-refresh-token__structure_aware__2",
+        "v3__auth-manager-refresh-token__structure_aware__1",
+        "v3__client-connect__structure_aware__1"
+      ],
+      "retrieval_distances": [
+        0.2852962613105774,
+        0.7622189521789551,
+        0.7854963541030884,
+        0.881115198135376,
+        1.1513922214508057
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "search_sa_Q8",
+      "source": "search_dump_structure_aware",
+      "question_id": "Q8",
+      "question": "Does `RateLimiter.configure()` v2 support a `burst` parameter?",
+      "known_answer": "",
+      "retrieved_chunk_ids": [
+        "v3__rate-limiter-configure__structure_aware__3",
+        "v3__rate-limiter-configure__structure_aware__2",
+        "v3__rate-limiter-configure__structure_aware__0",
+        "v2__rate-limiter-configure__structure_aware__0",
+        "v2__rate-limiter-configure__structure_aware__1"
+      ],
+      "retrieval_distances": [
+        0.45228689908981323,
+        0.73142409324646,
+        0.7427104711532593,
+        0.7783572673797607,
+        0.8214406371116638
+      ],
+      "hit_in_top5": true,
+      "answer": "",
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4b_06",
+      "source": "week4_baseline",
+      "question_id": "W4B_6",
+      "question": "What is the default chunk_size_mb for BatchUploader.upload() v3?",
+      "known_answer": "",
+      "expected_chunk_id": "v3__batch-uploader-upload__structure_aware__1",
+      "retrieved_chunk_ids": [
+        "v3__batch-uploader-upload__structure_aware__1",
+        "v3__batch-uploader-upload__structure_aware__0",
+        "v3__batch-uploader-upload__structure_aware__3"
+      ],
+      "hit": true,
+      "latency_ms": 21.128499996848404,
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4b_08",
+      "source": "week4_baseline",
+      "question_id": "W4B_8",
+      "question": "Does RateLimiter.configure() v2 support a burst parameter?",
+      "known_answer": "",
+      "expected_chunk_id": "v2__rate-limiter-configure__structure_aware__1",
+      "retrieved_chunk_ids": [
+        "v3__rate-limiter-configure__structure_aware__3",
+        "v3__rate-limiter-configure__structure_aware__2",
+        "v3__rate-limiter-configure__structure_aware__0"
+      ],
+      "hit": false,
+      "latency_ms": 18.69190001161769,
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4b_10",
+      "source": "week4_baseline",
+      "question_id": "W4B_10",
+      "question": "What is the default max_requests in RateLimiter.configure() v3?",
+      "known_answer": "",
+      "expected_chunk_id": "v3__rate-limiter-configure__structure_aware__1",
+      "retrieved_chunk_ids": [
+        "v2__rate-limiter-configure__structure_aware__3",
+        "v3__rate-limiter-configure__structure_aware__3",
+        "v2__rate-limiter-configure__structure_aware__2"
+      ],
+      "hit": false,
+      "latency_ms": 17.198100016685203,
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4a_01",
+      "source": "week4_after",
+      "question_id": "W4A_1",
+      "question": "What is the default value of retry_backoff_ms on Client.send() in v3?",
+      "known_answer": "",
+      "expected_chunk_id": "v3__client-send__structure_aware__2",
+      "retrieved_chunk_ids": [
+        "v3__client-send__structure_aware__2",
+        "v2__client-send__structure_aware__1",
+        "v3__client-send__structure_aware__1"
+      ],
+      "hit": true,
+      "latency_ms": 28.540600003907457,
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4a_03",
+      "source": "week4_after",
+      "question_id": "W4A_3",
+      "question": "In Client.connect() v3, what type is the region parameter and is it required?",
+      "known_answer": "",
+      "expected_chunk_id": "v3__client-connect__structure_aware__1",
+      "retrieved_chunk_ids": [
+        "v3__client-connect__structure_aware__0",
+        "v3__client-connect__structure_aware__3",
+        "v3__client-connect__structure_aware__1"
+      ],
+      "hit": true,
+      "latency_ms": 35.740099992835894,
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4a_04",
+      "source": "week4_after",
+      "question_id": "W4A_4",
+      "question": "What is the default window_ms value in RateLimiter.configure() v3?",
+      "known_answer": "",
+      "expected_chunk_id": "v3__rate-limiter-configure__structure_aware__1",
+      "retrieved_chunk_ids": [
+        "v2__rate-limiter-configure__structure_aware__1",
+        "v2__rate-limiter-configure__structure_aware__2",
+        "v3__rate-limiter-configure__structure_aware__0"
+      ],
+      "hit": false,
+      "latency_ms": 43.46889999578707,
+      "has_generation": false
+    },
+    {
+      "trace_id": "w4a_07",
+      "source": "week4_after",
+      "question_id": "W4A_7",
+      "question": "What is the default ttl_seconds for AuthManager.refresh_token() v3?",
+      "known_answer": "",
+      "expected_chunk_id": "v3__auth-manager-refresh-token__structure_aware__1",
+      "retrieved_chunk_ids": [
+        "v3__auth-manager-refresh-token__structure_aware__0",
+        "v3__auth-manager-refresh-token__structure_aware__2",
+        "v3__auth-manager-refresh-token__structure_aware__1"
+      ],
+      "hit": true,
+      "latency_ms": 18.417400016915053,
+      "has_generation": false
+    }
+  ]
+}
