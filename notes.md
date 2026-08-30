@@ -136,6 +136,12 @@ Prediction:
 After the change, this failure mode will decrease from 25% to 5%.
 ```
 
-## 6. Public benchmark explanation
+## 6. Git commit
+
+```text
+Git commit: 7be47f7
+```
+
+## 7. Public benchmark explanation
 
 A public benchmark would not have surfaced the top 3 failure modes because public benchmark questions typically test a single API version in isolation and do not include the same multi-version documentation conflict that exists in this corpus where v2 and v3 pages describe the same API methods with different defaults. Benchmark datasets may also use curated question sets that avoid version-specific phrasing, and their scoring metrics (e.g., exact-match or ROUGE) would judge final-answer correctness without exposing the specific operational failure pattern where the retrieval pipeline returns the wrong version's documentation as the top result.
