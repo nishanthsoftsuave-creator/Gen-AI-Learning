@@ -1,0 +1,19 @@
+{
+  "revisions": [
+    { "revision": 1, "date": "January 2017" },
+    { "revision": 2, "date": "June 2018" },
+    { "revision": 3, "date": "April 2020" },
+    { "revision": 4, "date": "June 2021" },
+    { "revision": 5, "date": "November 2021" },
+    { "revision": 6, "date": "April 2022" },
+    { "revision": 7, "date": "June 2022" },
+    { "revision": 8, "date": "November 2022" },
+    { "revision": 9, "date": "May 2023" },
+    { "revision": 10, "date": "May 2023" },
+    { "revision": 11, "date": "June 2025" }
+  ],
+  "total_revisions": 11,
+  "latest_revision": { "revision": 11, "date": "June 2025" },
+  "modifications_clause": "We are committed to continuously reviewing and updating our policies and procedures as a part of periodic assessment. Therefore, the Employee Handbook will be periodically revised and is subject to modification.",
+  "source_note": "Transcribed verbatim from the final pages of documents/SS Employee Handbook Updated-2025 (1).pdf. Revisions 9 and 10 are both dated 'May 2023' in the source document itself -- not a transcription error here."
+}

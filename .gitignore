@@ -1,0 +1,35 @@
+# Environment & virtual environments
+venv/
+.venv/
+env/
+ENV/
+.env
+.env.*
+
+# Python compiled files
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Local databases & vector stores
+chroma_db/
+*.sqlite
+*.db
+
+# Generated runtime data
+output/
+uploads/
+
+# Uploaded/source documents (remove these lines if you want the PDFs tracked)
+documents/
+
+# Frontend dependencies & builds
+frontend/node_modules/
+frontend/dist/
+
+# IDE & OS files
+.vscode/
+.DS_Store
+Thumbs.db

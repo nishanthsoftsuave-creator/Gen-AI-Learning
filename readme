@@ -1,0 +1,11 @@
+Run Fast API python :uvicorn src.app:app --reload
+
+
+Activate venv
+PowerShell : .\venv\Scripts\Activate.ps1
+cmd.exe: venv\Scripts\activate.bat
+Git Bash: source venv/Scripts/activate
+
+
+frontend 
+npm run dev 

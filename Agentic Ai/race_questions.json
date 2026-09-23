@@ -1,0 +1,80 @@
+[
+  {
+    "id": "Q1",
+    "question": "Who is the CEO of Soft Suave, and who is the Managing Director?",
+    "categories": ["simple_lookup", "leadership"],
+    "requires_dependency": false,
+    "must_contain": ["ramesh vayavuru", "manohar vayyavuru"]
+  },
+  {
+    "id": "Q2",
+    "question": "How many times has the Employee Handbook been revised, and when was the most recent revision?",
+    "categories": ["revision_history"],
+    "requires_dependency": false,
+    "must_contain": ["11", "june 2025"]
+  },
+  {
+    "id": "Q3",
+    "question": "If I'm unsure whether something counts as misconduct under the Code of Conduct, who should I talk to, and what could happen to me if I'm later found to have committed misconduct anyway?",
+    "categories": ["cross_reference", "multi_step"],
+    "requires_dependency": true,
+    "dependency_note": "search_handbook/get_policy_section(employee_code_of_conduct) surfaces 'consult a Reporting Senior or HR'; the agent must separately pull get_policy_section(disciplinary_actions) for the consequences (reprimand/suspension/termination/detraction of benefits) -- one section doesn't answer both halves.",
+    "must_contain": ["reporting senior"],
+    "must_contain_any": ["reprimand", "suspension", "termination"]
+  },
+  {
+    "id": "Q4",
+    "question": "What's the difference in compensation for technical team members versus non-technical team members who work on a company non-working day?",
+    "categories": ["policy_comparison"],
+    "requires_dependency": false,
+    "must_contain": ["1000"],
+    "must_contain_any": ["equivalent to one day", "one day compensation", "comp"]
+  },
+  {
+    "id": "Q5",
+    "question": "How many revisions has the Handbook gone through in total, and what email address should I use to reach the HR team with a question about one of those changes?",
+    "categories": ["revision_history", "multi_step"],
+    "requires_dependency": true,
+    "dependency_note": "get_handbook_revisions gives the count (11); the HR contact email is in a separate, unrelated section (contact_details) that must be looked up independently.",
+    "must_contain": ["11", "teamhr@softsuave.com"]
+  },
+  {
+    "id": "Q6",
+    "question": "What email address should I use to reach the HR team, and who is the HRM (HR Manager)?",
+    "categories": ["simple_lookup"],
+    "requires_dependency": false,
+    "must_contain": ["teamhr@softsuave.com"],
+    "must_contain_any": ["sudhendra"]
+  },
+  {
+    "id": "Q7",
+    "question": "What are the possible disciplinary consequences for repeatedly or intentionally failing to follow the Employee Handbook?",
+    "categories": ["policy_detail"],
+    "requires_dependency": false,
+    "must_contain": ["suspension", "termination"]
+  },
+  {
+    "id": "Q8",
+    "question": "The Handbook says employees unconditionally agree to be bound by it, including future changes. Given that, how is the Handbook itself kept up to date over time?",
+    "categories": ["cross_reference", "multi_step"],
+    "requires_dependency": true,
+    "dependency_note": "search_handbook surfaces the 'agreed to be bound... to any changes therein' acceptance language; get_handbook_revisions is then needed for the actual mechanism/history (periodic revision, modifications clause, 11 dated revisions).",
+    "must_contain_any": ["periodically revised", "subject to modification"],
+    "must_contain": ["revised"]
+  },
+  {
+    "id": "Q9",
+    "question": "If a technical-team employee helps with an offline recruitment drive on a non-working day, how much are they paid if it requires outstation travel versus if it doesn't?",
+    "categories": ["policy_detail", "policy_comparison"],
+    "requires_dependency": false,
+    "must_contain": ["1000", "500"]
+  },
+  {
+    "id": "Q10",
+    "question": "Under which CEO and Managing Director was the Handbook issued, and how many total revisions has it undergone since the first one?",
+    "categories": ["leadership", "revision_history", "multi_step"],
+    "requires_dependency": true,
+    "dependency_note": "Leadership names and the revision count live in unrelated parts of the document; get_policy_section-style lookup for leadership plus get_handbook_revisions for the count -- neither alone answers both halves.",
+    "must_contain": ["ramesh vayavuru", "manohar vayyavuru", "11"]
+  }
+]
