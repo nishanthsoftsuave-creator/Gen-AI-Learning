@@ -15,7 +15,10 @@ export default function ChatArea({ messages, asking }) {
     <div className="chat-area" ref={scrollRef}>
       {messages.length === 0 && !asking && (
         <div className="chat-empty">
-          <div className="icon">💬</div>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M6 3h12v14l-4 4v-4H6z" strokeLinejoin="round" />
+            <path d="M9 8h6M9 11.5h4" strokeLinecap="round" />
+          </svg>
           <p>Upload a PDF, then ask questions about it.</p>
         </div>
       )}

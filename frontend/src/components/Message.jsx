@@ -11,7 +11,7 @@ export default function Message({ role, text, isMarkdown, sources }) {
         {sources && sources.length > 0 && (
           <div className="sources">
             <details>
-              <summary>📎 {sources.length} source chunks</summary>
+              <summary>{sources.length} source chunks</summary>
               {sources.map((chunk, idx) => (
                 <div className="chunk" key={idx}>
                   Chunk {idx + 1}: {typeof chunk === "string" ? chunk : chunk.text}

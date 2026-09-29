@@ -182,9 +182,32 @@ TOOL_FUNCTIONS = {
 }
 
 
+# Groq's tool-calling has been observed (Week 8 Step 3 baseline: 14/14
+# invalid-argument occurrences, across Q2/Q5/Q8/Q10) to emit one of these
+# exact spurious shapes for get_handbook_revisions -- a zero-parameter tool
+# -- instead of a clean {}. This is a narrow, exact-match allowlist, not a
+# general leniency policy: only these specific shapes are recognized, and
+# only for this one tool. Any other argument (e.g. {"foo": "bar"} or
+# {"version": "v3"}) is left untouched and still fails exactly as before.
+_SPURIOUS_EMPTY_ARGUMENT_FORMS = [
+    {},
+    {"": ""},
+    {"": "{}"},
+    {"{}": "{}"},
+]
+
+
+def _normalize_zero_arg_call(name, arguments):
+    if name == "get_handbook_revisions" and arguments in _SPURIOUS_EMPTY_ARGUMENT_FORMS:
+        return {}
+    return arguments
+
+
 def dispatch_tool(name, arguments):
     if name not in TOOL_FUNCTIONS:
         raise ToolError(f"Unknown tool '{name}'.")
+
+    arguments = _normalize_zero_arg_call(name, arguments)
 
     try:
         return TOOL_FUNCTIONS[name](**arguments)

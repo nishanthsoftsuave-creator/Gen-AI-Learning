@@ -17,13 +17,14 @@ function formatLatency(seconds) {
   return seconds >= 10 ? `${seconds.toFixed(1)}s` : `${Math.round(seconds * 1000)}ms`;
 }
 
-function SystemPanel({ label, run, isWinner }) {
+function SystemPanel({ label, system, run, isWinner }) {
   const clean = run.termination_reason === "COMPLETED";
 
   return (
-    <div className={`race-panel${isWinner ? " winner" : ""}`}>
+    <div className={`race-panel race-panel-${system}${isWinner ? " winner" : ""}`}>
       <div className="race-panel-head">
         <span className="race-panel-label">{label}</span>
+        {isWinner && <span className="race-panel-crown">More efficient</span>}
         <span className={`race-status-badge${clean ? " ok" : " warn"}`}>
           {clean ? "completed" : run.termination_reason.replace(/_/g, " ").toLowerCase()}
         </span>
@@ -55,7 +56,7 @@ function SystemPanel({ label, run, isWinner }) {
 
       {run.tool_calls.length > 0 && (
         <details className="race-tool-calls">
-          <summary>🔧 {run.tool_calls.length} tool call{run.tool_calls.length === 1 ? "" : "s"}</summary>
+          <summary>{run.tool_calls.length} tool call{run.tool_calls.length === 1 ? "" : "s"}</summary>
           {run.tool_calls.map((call, idx) => (
             <div className="race-tool-call" key={idx}>
               <code>{call.tool}</code>
@@ -76,7 +77,7 @@ function RaceResult({ entry }) {
       <div className="race-question">{entry.question}</div>
 
       <div className={`race-verdict ${entry.verdict.winner}`}>
-        ⚡ <strong>{winnerLabel}</strong> was more efficient here — {entry.verdict.reason}.
+        <strong>{winnerLabel}</strong> was more efficient here — {entry.verdict.reason}.
         <span className="race-verdict-caveat">
           {" "}
           (efficiency only — read both answers below to judge accuracy yourself)
@@ -84,8 +85,18 @@ function RaceResult({ entry }) {
       </div>
 
       <div className="race-columns">
-        <SystemPanel label="🤖 Dynamic Agent" run={entry.agent} isWinner={entry.verdict.winner === "agent"} />
-        <SystemPanel label="📋 Fixed Workflow" run={entry.workflow} isWinner={entry.verdict.winner === "workflow"} />
+        <SystemPanel
+          label="Dynamic Agent"
+          system="agent"
+          run={entry.agent}
+          isWinner={entry.verdict.winner === "agent"}
+        />
+        <SystemPanel
+          label="Fixed Workflow"
+          system="workflow"
+          run={entry.workflow}
+          isWinner={entry.verdict.winner === "workflow"}
+        />
       </div>
     </div>
   );
@@ -182,7 +193,12 @@ export default function AgenticRace() {
 
       {results.length === 0 && !running && (
         <div className="race-empty">
-          <div className="icon">⚖️</div>
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <path d="M5 4v16M19 4v16" strokeLinecap="round" />
+            <path d="M5 4h5m4 0h5" strokeLinecap="round" />
+            <circle cx="5" cy="11" r="2.4" />
+            <circle cx="19" cy="11" r="2.4" />
+          </svg>
           <p>No comparisons yet — ask a question above or try an example.</p>
         </div>
       )}
