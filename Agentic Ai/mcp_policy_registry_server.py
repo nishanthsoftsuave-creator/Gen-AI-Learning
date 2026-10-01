@@ -150,15 +150,65 @@ def _require(arguments, keys):
         raise PolicyError(f"Missing required argument(s): {', '.join(missing)}")
 
 
+def _not_found_error(policy_id, version, policy=None):
+    """Build a recoverable not-found message FROM the actual registry
+    data, so the model can tell what does not exist, what does exist,
+    and what to do instead.
+
+    Args:
+        policy_id (str): the requested policy id.
+        version (str | None): the requested version key; ``None`` when
+            the policy id itself is unknown.
+        policy (dict | None): the policy record when the id exists.
+
+    Returns:
+        str: multi-line message (published versions, deprecations,
+        current version + effective date, suggested recovery).
+    """
+    if policy is None:
+        known = ", ".join(REGISTRY["policies"])
+        return (
+            f"Policy '{policy_id}' does not exist in the HR Policy Registry.\n"
+            f"Available policies: {known}.\n"
+            "Suggested recovery: use one of the available policy ids."
+        )
+    versions = policy["versions"]
+    current = policy["current_version"]
+    published = ", ".join(versions)
+    deprecated = ", ".join(
+        key for key, record in versions.items() if record["status"] == "deprecated"
+    ) or "none"
+    superseded = ", ".join(
+        key for key, record in versions.items() if record["status"] == "superseded"
+    ) or "none"
+    return (
+        f"Requested {policy_id} version {version} does not exist.\n"
+        "\n"
+        f"Latest published version: {current}.\n"
+        f"Status: {version} has not been published.\n"
+        "\n"
+        "Available information:\n"
+        f"- Current version: {current}\n"
+        f"- Effective date: {versions[current]['effective_date']}\n"
+        f"- Published versions: {published}\n"
+        f"- Deprecated versions: {deprecated}\n"
+        f"- Superseded versions: {superseded}\n"
+        "\n"
+        "Suggested recovery:\n"
+        f"Use {current} if the user wants the currently published policy."
+    )
+
+
 def _get_policy(policy_id):
     """Look up one policy by registry id.
 
     Raises:
-        PolicyError: when the id is not in the registry.
+        PolicyError: with a recoverable message listing the policy ids
+        that DO exist in the registry.
     """
     policy = REGISTRY["policies"].get(policy_id)
     if policy is None:
-        raise PolicyError("policy not found")
+        raise PolicyError(_not_found_error(policy_id, None, None))
     return policy
 
 
@@ -167,14 +217,16 @@ def _resolve(policy_id, version):
     the current published version when ``version`` is None.
 
     Raises:
-        PolicyError: when the policy id or the version key is unknown.
+        PolicyError: when the policy id or the version key is unknown --
+        the version error states the latest published version, effective
+        date, and available versions, all read from the registry.
     """
     policy = _get_policy(policy_id)
     if version is None:
         version = policy["current_version"]
     record = policy["versions"].get(version)
     if record is None:
-        raise PolicyError("policy not found")
+        raise PolicyError(_not_found_error(policy_id, version, policy))
     return version, record
 
 
