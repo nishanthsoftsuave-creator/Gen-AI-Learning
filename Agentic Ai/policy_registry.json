@@ -1,0 +1,193 @@
+{
+  "registry_name": "Soft Suave HR Policy Registry",
+  "maintainer": "HR Platform Team (placeholder -- ownership must be verified before deployment)",
+  "last_updated": "2026-09-15",
+  "policies": {
+    "leave_policy": {
+      "title": "Leave Policy",
+      "owner": "HR Policy Team",
+      "category": "Leave",
+      "applies_to": "All full-time employees",
+      "last_reviewed": "2025-06-20",
+      "current_version": "v2.1",
+      "versions": {
+        "v1": {
+          "status": "deprecated",
+          "effective_date": "2022-04-01",
+          "deprecated_on": "2024-01-01",
+          "superseded_by": "v2",
+          "summary": "Original annual leave entitlement."
+        },
+        "v2": {
+          "status": "superseded",
+          "effective_date": "2024-01-01",
+          "deprecated_on": "2025-07-01",
+          "superseded_by": "v2.1",
+          "summary": "Added sick-leave bucket."
+        },
+        "v2.1": {
+          "status": "active",
+          "effective_date": "2025-07-01",
+          "deprecated_on": null,
+          "superseded_by": null,
+          "summary": "Clarified carry-forward limits and encashment rules."
+        }
+      }
+    },
+    "remote_work_policy": {
+      "title": "Remote Work Policy",
+      "owner": "HR Policy Team",
+      "category": "Workplace",
+      "applies_to": "All employees",
+      "last_reviewed": "2026-08-01",
+      "current_version": "v3.2",
+      "versions": {
+        "v1": {
+          "status": "deprecated",
+          "effective_date": "2023-01-16",
+          "deprecated_on": "2024-06-01",
+          "superseded_by": "v2",
+          "summary": "First published remote-work guidelines."
+        },
+        "v2": {
+          "status": "deprecated",
+          "effective_date": "2024-06-01",
+          "deprecated_on": "2025-11-01",
+          "superseded_by": "v3",
+          "summary": "Expanded hybrid schedule rules."
+        },
+        "v3": {
+          "status": "superseded",
+          "effective_date": "2025-11-01",
+          "deprecated_on": "2026-08-01",
+          "superseded_by": "v3.2",
+          "summary": "Eligibility criteria by role tier."
+        },
+        "v3.2": {
+          "status": "active",
+          "effective_date": "2026-08-01",
+          "deprecated_on": null,
+          "superseded_by": null,
+          "summary": "Amended equipment stipend and core-hours rules."
+        }
+      }
+    },
+    "attendance_policy": {
+      "title": "Attendance Policy",
+      "owner": "People Operations",
+      "category": "Attendance",
+      "applies_to": "All employees",
+      "last_reviewed": "2025-05-15",
+      "current_version": "v3",
+      "versions": {
+        "v1": {
+          "status": "deprecated",
+          "effective_date": "2021-09-01",
+          "deprecated_on": "2023-03-01",
+          "superseded_by": "v2",
+          "summary": "Original swipe-in window rules."
+        },
+        "v2": {
+          "status": "superseded",
+          "effective_date": "2023-03-01",
+          "deprecated_on": "2025-05-15",
+          "superseded_by": "v3",
+          "summary": "Introduced grace-period limit of 15 minutes."
+        },
+        "v3": {
+          "status": "active",
+          "effective_date": "2025-05-15",
+          "deprecated_on": null,
+          "superseded_by": null,
+          "summary": "Hybrid attendance days tracked per sprint."
+        }
+      }
+    },
+    "expense_policy": {
+      "title": "Expense Policy",
+      "owner": "Finance Operations",
+      "category": "Finance",
+      "applies_to": "All employees",
+      "last_reviewed": "2026-03-01",
+      "current_version": "v3",
+      "versions": {
+        "v1": {
+          "status": "deprecated",
+          "effective_date": "2022-01-10",
+          "deprecated_on": "2024-09-01",
+          "superseded_by": "v2",
+          "summary": "Original travel reimbursement caps."
+        },
+        "v2": {
+          "status": "superseded",
+          "effective_date": "2024-09-01",
+          "deprecated_on": "2026-03-01",
+          "superseded_by": "v3",
+          "summary": "Receipt threshold lowered to 500 INR."
+        },
+        "v3": {
+          "status": "active",
+          "effective_date": "2026-03-01",
+          "deprecated_on": null,
+          "superseded_by": null,
+          "summary": "Monthly submission deadline and approval routing."
+        }
+      }
+    },
+    "parental_leave_policy": {
+      "title": "Parental Leave Policy",
+      "owner": "HR Policy Team",
+      "category": "Leave",
+      "applies_to": "Employees with 1+ year of service",
+      "last_reviewed": "2025-10-01",
+      "current_version": "v2",
+      "versions": {
+        "v1": {
+          "status": "superseded",
+          "effective_date": "2023-03-08",
+          "deprecated_on": "2025-10-01",
+          "superseded_by": "v2",
+          "summary": "Initial parental leave entitlement."
+        },
+        "v2": {
+          "status": "active",
+          "effective_date": "2025-10-01",
+          "deprecated_on": null,
+          "superseded_by": null,
+          "summary": "Extended paid leave and phased return option."
+        }
+      }
+    },
+    "code_of_conduct": {
+      "title": "Code of Conduct",
+      "owner": "Legal & Compliance",
+      "category": "Conduct",
+      "applies_to": "All employees and contractors",
+      "last_reviewed": "2026-01-15",
+      "current_version": "v3",
+      "versions": {
+        "v1": {
+          "status": "deprecated",
+          "effective_date": "2020-06-01",
+          "deprecated_on": "2023-06-01",
+          "superseded_by": "v2",
+          "summary": "Baseline conduct standards."
+        },
+        "v2": {
+          "status": "superseded",
+          "effective_date": "2023-06-01",
+          "deprecated_on": "2026-01-15",
+          "superseded_by": "v3",
+          "summary": "Added conflicts-of-interest disclosure."
+        },
+        "v3": {
+          "status": "active",
+          "effective_date": "2026-01-15",
+          "deprecated_on": null,
+          "superseded_by": null,
+          "summary": "Added AI-tool use and data-handling expectations."
+        }
+      }
+    }
+  }
+}

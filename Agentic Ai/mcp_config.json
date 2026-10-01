@@ -5,6 +5,12 @@
       "command": "../venv/Scripts/python.exe",
       "args": ["mcp_handbook_server.py"],
       "cwd": "."
+    },
+    "hr-policy-registry": {
+      "name": "HR Policy Registry MCP server",
+      "command": "../venv/Scripts/python.exe",
+      "args": ["mcp_policy_registry_server.py"],
+      "cwd": "."
     }
   }
 }
