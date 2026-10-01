@@ -1,0 +1,45 @@
+config_diff.txt
+Week 9 HR Handbook MCP practical -- Task 2: the MCP configuration is
+WHAT CHANGED when the HR Policy Registry MCP server was added.
+
+WHAT IS COMPARED
+  BEFORE: git commit 7529bc1 (mcp_config.json with server one only)
+  AFTER:  git commit 63a1226 (mcp_config.json with server two added)
+
+COMMAND RUN (from repository root)
+
+    git diff 7529bc1 63a1226 -- "Agentic Ai/mcp_config.json"
+
+OUTPUT
+
+    diff --git a/Agentic Ai/mcp_config.json b/Agentic Ai/mcp_config.json
+    index f9c6e81..c911418 100644
+    --- a/Agentic Ai/mcp_config.json
+    +++ b/Agentic Ai/mcp_config.json
+    @@ -5,6 +5,12 @@
+           "command": "../venv/Scripts/python.exe",
+           "args": ["mcp_handbook_server.py"],
+           "cwd": "."
+    +    },
+    +    "hr-policy-registry": {
+    +      "name": "HR Policy Registry MCP server",
+    +      "command": "../venv/Scripts/python.exe",
+    +      "args": ["mcp_policy_registry_server.py"],
+    +      "cwd": "."
+         }
+       }
+     }
+
+WHAT THE DIFF PROVES
+- + HR Policy Registry MCP server: the new entry registers exactly one
+  command (an independent stdio MCP server process) in mcpServers.
+- The diff contains NO tool definitions: no tool names, no parameter
+  schemas, no descriptions of get_policy_version /
+  get_policy_effective_date / get_policy_deprecation /
+  get_policy_metadata anywhere in the config. Those four definitions
+  live inside the server (mcp_policy_registry_server.py::TOOL_DEFS) and
+  reach the agent only through the MCP tools/list response.
+- The diff touches NO agent file (see agent_diff.txt: 0 lines changed).
+- Adding server two = this +6-line config entry plus the server's own
+  two new files (implementation + data). Remove the entry above and the
+  agent discovers 3 tools again -- the config is the only switch.

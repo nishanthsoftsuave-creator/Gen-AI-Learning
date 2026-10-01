@@ -1,0 +1,57 @@
+agent_diff.txt
+Week 9 HR Handbook MCP practical -- Task 2: prove ZERO agent-module changes when adding the HR Policy Registry MCP server.
+
+WHAT IS COMPARED
+  BEFORE adding server two: git commit 7529bc1
+    "feature: rewrite get_policy_section MCP description as a tool-use prompt (Week 9 task 5)"
+    = state where the MCP host + HR Handbook MCP server (server one) already existed
+      and mcp_config.json contained ONLY server one.
+  AFTER adding server two: git commit 63a1226
+    "fix: make HR Policy Registry not-found errors recoverable (Week 9 task 6)"
+    = state where the HR Policy Registry MCP server (server two) was added through
+      configuration only (commits ad3f3d2 + 63a1226).
+
+COMMAND RUN (from repository root)
+
+    git diff 7529bc1 63a1226 -- "Agentic Ai/agent.py" "Agentic Ai/llm_client.py" ^
+        "Agentic Ai/budgets.py" "Agentic Ai/agent_tracing.py" ^
+        "Agentic Ai/workflow.py" "Agentic Ai/race.py" ^
+        "Agentic Ai/budget_termination_test.py" "Agentic Ai/tools.py"
+
+OUTPUT
+
+    (empty)
+
+RESULT: 0 lines changed in the agent module.
+
+--------------------------------------------------------------------
+For transparency -- the complete diff stat between the SAME two states
+(what DID change when server two was added):
+
+    Agentic Ai/mcp_config.json               |   6 +
+    Agentic Ai/mcp_policy_registry_server.py | 447 +++++++++++++++++++++++++++++++
+    Agentic Ai/policy_registry.json          | 193 +++++++++++++
+    3 files changed, 646 insertions(+)
+
+  646 insertions, 0 deletions: adding server two did not modify a single
+  line of any existing application file. Only the MCP configuration
+  gained an entry (see config_diff.txt); the two other files are server
+  two's own implementation and its data file.
+
+--------------------------------------------------------------------
+Notes:
+- "Agent module" scope: agent.py (the agent loop) plus its direct
+  companions llm_client.py, budgets.py, agent_tracing.py, workflow.py,
+  race.py, budget_termination_test.py -- and tools.py (the tools module
+  agent.py imports). All are byte-identical across the comparison.
+- agent.py still imports TOOL_SCHEMAS / dispatch_tool / ToolError from
+  tools.py and never names any MCP server, MCP config key, or MCP tool.
+  It cannot know about server two: the four registry tools reach the
+  model only through tools/list discovery (tools.py bottom block) and
+  tools/call dispatch (tools.py::_dispatch_mcp_tool).
+- The only file that was ever edited for this practical (tools.py, in
+  commit c6aea49 + 7529bc1) was edited BEFORE server two existed, so it
+  contributes zero lines to this before/after comparison.
+- Verification repeated in the final report after the evidence commit;
+  the two hashes above are permanent and re-checkable with the command
+  above at any time.

@@ -1,0 +1,191 @@
+{
+  "capture": {
+    "server": "HR Policy Registry MCP server (config key: hr-policy-registry)",
+    "captured_at": "2026-10-01T12:44:09",
+    "transport": "stdio, newline-delimited JSON-RPC 2.0 (MCP)",
+    "how": "Dedicated live session against the running server; frames extracted verbatim from Agentic Ai/output/mcp_trace.jsonl send/recv records."
+  },
+  "top_level_field_annotations": {
+    "top_level_field_annotations": "This map itself: one manual explanation per top-level field of this file, so every top-level field is annotated.",
+    "capture": "Provenance of this file: which server, when, over what transport, and how the frames were obtained.",
+    "field_annotations": "Manual explanation of every JSON-RPC field name that appears in this file.",
+    "initialize": "The MCP handshake exchange: request, the follow-up initialized notification, and the server's response.",
+    "tools_list": "The MCP tool-discovery exchange: the request the agent/host sends and the server's actual tool catalog response.",
+    "tools_call": "The MCP tool-invocation exchange: the request carrying tool name + arguments and the server's actual result.",
+    "actual_tool_response": "The tools_call result payload decoded for humans: the exact text the agent's model receives.",
+    "closing_statement": "Required statement about where the LLM lives."
+  },
+  "field_annotations": {
+    "jsonrpc": "Protocol version string; always \"2.0\". Pins the JSON-RPC version both sides speak; a response without it is malformed.",
+    "id": "Request identifier (integer here). The response echoes it so the caller can match responses to outstanding requests. A message with NO id is a notification (e.g. notifications/initialized) and must never be answered.",
+    "method": "The RPC being invoked: 'initialize' starts the session and negotiates protocol version/capabilities; 'tools/list' asks the server to enumerate its tools (the discovery step the agent's tool list is built from); 'tools/call' invokes one tool; 'notifications/initialized' tells the server the client is ready (notification, no response).",
+    "params": "Method-specific payload object. For initialize: protocol version, client capabilities, client info. For tools/list: (empty here; optional cursor field exists for pagination). For tools/call: which tool and with what arguments.",
+    "name": "Inside tools/call params: which tool to execute. Must match a name the server returned in tools/list -- here get_policy_effective_date.",
+    "arguments": "Inside tools/call params: a JSON object of arguments for that tool, validated against the tool's inputSchema declared in tools/list.",
+    "result": "Successful response payload. initialize result: negotiated protocolVersion, server capabilities, serverInfo. tools/list result: the tools array (name, description, inputSchema per tool). tools/call result: content blocks (type 'text') carrying the tool's output, plus optional isError.",
+    "error": "JSON-RPC error payload {code, message} for PROTOCOL-level failures (unknown method, malformed request, parse error). It does not appear in this capture: tool-level failures come back inside result with isError=true instead, so the model can read them as tool output.",
+    "protocolVersion": "MCP protocol version the client proposes; the server echoes the version it will speak.",
+    "capabilities": "Feature declarations. Client: {} (no extras). Server: tools capability with listChanged=false (the tool list does not push change notifications).",
+    "serverInfo": "Server identity: name + version reported during initialize.",
+    "content": "tools/call result: array of content blocks; here one {type:'text', text:...} block with the JSON tool output.",
+    "isError": "tools/call result flag: true means the tool RAN but reports a failure whose human-readable message is inside content -- distinct from the 'error' field (protocol failure). Absent/false = success."
+  },
+  "initialize": {
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "initialize",
+      "params": {
+        "protocolVersion": "2025-06-18",
+        "capabilities": {},
+        "clientInfo": {
+          "name": "hr-agent-host",
+          "version": "1.0"
+        }
+      }
+    },
+    "notification": {
+      "jsonrpc": "2.0",
+      "method": "notifications/initialized"
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "protocolVersion": "2025-06-18",
+        "capabilities": {
+          "tools": {
+            "listChanged": false
+          }
+        },
+        "serverInfo": {
+          "name": "hr-policy-registry-mcp",
+          "version": "1.0.0"
+        }
+      }
+    }
+  },
+  "tools_list": {
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "method": "tools/list",
+      "params": {}
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "tools": [
+          {
+            "name": "get_policy_version",
+            "description": "Get the full published record of ONE specific version of an HR policy (status, effective date, deprecation info, summary). USE when the user names a policy AND a specific version (e.g. 'remote work policy v4'). REQUIRED: `policy` (registry id) and `version` (exact published key, e.g. v3.2). Returns the version record, or an error if the policy id or version does not exist. For only the current version's metadata use get_policy_metadata; for only a date use get_policy_effective_date.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "policy": {
+                  "type": "string",
+                  "description": "Policy id: leave_policy, remote_work_policy, attendance_policy, expense_policy, parental_leave_policy, or code_of_conduct."
+                },
+                "version": {
+                  "type": "string",
+                  "description": "Exact published version key, e.g. v3 or v3.2."
+                }
+              },
+              "required": [
+                "policy",
+                "version"
+              ]
+            }
+          },
+          {
+            "name": "get_policy_effective_date",
+            "description": "Get the date a policy version took effect. USE when the user asks when a policy started, was effective, or was updated. REQUIRED: `policy`; OPTIONAL: `version` (defaults to the policy's current version). Returns policy id, version, effective date, and status, or an error if the policy id or version does not exist.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "policy": {
+                  "type": "string",
+                  "description": "Policy id, e.g. remote_work_policy."
+                },
+                "version": {
+                  "type": "string",
+                  "description": "Optional version key; defaults to the current version."
+                }
+              },
+              "required": [
+                "policy"
+              ]
+            }
+          },
+          {
+            "name": "get_policy_deprecation",
+            "description": "Check whether a policy version is active, deprecated, or superseded, and which version replaced it. USE when the user asks whether a policy or version is still active, retired, replaced, or superseded. REQUIRED: `policy`; OPTIONAL: `version` (defaults to the current version). Returns status, deprecated_on, and superseded_by, or an error if the policy id or version does not exist.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "policy": {
+                  "type": "string",
+                  "description": "Policy id, e.g. remote_work_policy."
+                },
+                "version": {
+                  "type": "string",
+                  "description": "Optional version key; defaults to the current version."
+                }
+              },
+              "required": [
+                "policy"
+              ]
+            }
+          },
+          {
+            "name": "get_policy_metadata",
+            "description": "Get registry metadata for a policy: title, owner, category, applies_to, current version, full version history, and last reviewed date. USE for questions about policy ownership or administration, or which versions exist. Does NOT return the policy's prose content -- use search_handbook or get_policy_section for Handbook text. REQUIRED: `policy`. Returns metadata, or an error if the policy id does not exist.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "policy": {
+                  "type": "string",
+                  "description": "Policy id, e.g. code_of_conduct."
+                }
+              },
+              "required": [
+                "policy"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "tools_call": {
+    "request": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "method": "tools/call",
+      "params": {
+        "name": "get_policy_effective_date",
+        "arguments": {
+          "policy": "remote_work_policy"
+        }
+      }
+    },
+    "response": {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "{\"policy\": \"remote_work_policy\", \"version\": \"v3.2\", \"effective_date\": \"2026-08-01\", \"status\": \"active\"}"
+          }
+        ]
+      }
+    }
+  },
+  "actual_tool_response": {
+    "decoded_text": "{\"policy\": \"remote_work_policy\", \"version\": \"v3.2\", \"effective_date\": \"2026-08-01\", \"status\": \"active\"}",
+    "is_error": false
+  },
+  "closing_statement": "The model call happens in the agent/host layer. The MCP server does not call the LLM."
+}
