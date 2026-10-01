@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "hr-handbook": {
+      "name": "HR Handbook MCP server",
+      "command": "../venv/Scripts/python.exe",
+      "args": ["mcp_handbook_server.py"],
+      "cwd": "."
+    }
+  }
+}

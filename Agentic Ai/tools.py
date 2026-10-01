@@ -18,6 +18,7 @@ invented or silently corrected.
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -203,9 +204,51 @@ def _normalize_zero_arg_call(name, arguments):
     return arguments
 
 
+# Set only by the MCP initialization block at the bottom of this module,
+# in the agent/host process. It stays None inside an MCP server subprocess
+# (HR_MCP_SERVER_ROLE), so a server's dispatch remains purely local.
+_mcp_call_tool = None
+
+
+def _dispatch_mcp_tool(name, arguments):
+    """Invoke a tool discovered via MCP ``tools/list`` on the server that
+    owns it, through ``tools/call``.
+
+    Args:
+        name (str): a tool name from discovery (not in TOOL_FUNCTIONS).
+        arguments (dict): JSON-object tool arguments.
+
+    Returns:
+        dict: the parsed JSON tool result.
+
+    Raises:
+        ToolError: with the server's own message when the server reports
+        ``isError`` (e.g. a recoverable "version not found" response), or
+        with a message naming the failure when the MCP server itself is
+        unreachable -- so the model can tell "unknown policy/version"
+        apart from "MCP server failure".
+    """
+    if not isinstance(arguments, dict):
+        raise ToolError(f"Bad arguments for tool '{name}': expected a JSON object.")
+    if name not in known_tools():
+        raise ToolError(f"Unknown tool '{name}'.")
+    try:
+        text, is_error = _mcp_call_tool(name, arguments)
+    except MCPTransportError as exc:
+        raise ToolError(f"MCP server call failed for '{name}': {exc}") from exc
+    if is_error:
+        raise ToolError(text)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {"text": text}
+
+
 def dispatch_tool(name, arguments):
     if name not in TOOL_FUNCTIONS:
-        raise ToolError(f"Unknown tool '{name}'.")
+        if _mcp_call_tool is None:
+            raise ToolError(f"Unknown tool '{name}'.")
+        return _dispatch_mcp_tool(name, arguments)
 
     arguments = _normalize_zero_arg_call(name, arguments)
 
@@ -295,3 +338,34 @@ TOOL_SCHEMAS = [
         },
     },
 ]
+
+# ---------------------------------------------------------------------------
+# MCP discovery (Week 9): in the agent/host process the exported
+# TOOL_SCHEMAS above are replaced by whatever tools/list reports for the
+# servers declared in mcp_config.json -- MCP discovery, not this file, is
+# the source of truth for which tools the agent sees. Inside an MCP server
+# subprocess (HR_MCP_SERVER_ROLE, set by mcp_host.py at spawn and by each
+# server script itself at start-up) discovery is skipped entirely, so a
+# server never acts as its own client.
+# ---------------------------------------------------------------------------
+
+from mcp_host import (  # noqa: E402
+    MCPDiscoveryError,
+    MCPTransportError,
+    call_tool,
+    discover_tools,
+    known_tools,
+    to_openai_schema,
+)
+
+if not os.environ.get("HR_MCP_SERVER_ROLE"):
+    try:
+        TOOL_SCHEMAS = [to_openai_schema(tool) for tool in discover_tools()]
+    except MCPDiscoveryError as exc:
+        print(
+            f"[tools] MCP discovery unavailable ({exc}); "
+            "using the built-in handbook tool schemas.",
+            file=sys.stderr,
+        )
+    else:
+        _mcp_call_tool = call_tool
