@@ -20,6 +20,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 AGENTIC = Path(__file__).resolve().parent
 REPO = AGENTIC.parent
 EVID = REPO / "week9-hr-handbook-mcp"
@@ -193,20 +195,22 @@ def test_wire_json_complete_and_annotated():
     assert wire["tools_call"]["request"]["method"] == "tools/call"
     assert wire["tools_call"]["request"]["params"]["name"] == "get_policy_effective_date"
     for field in ("jsonrpc", "id", "method", "params", "name",
-                  "arguments", "result", "error"):
+                  "arguments", "result", "error", "tools",
+                  "description", "inputSchema"):
         assert field in wire["field_annotations"], field
     missing = [key for key in wire if key not in wire["top_level_field_annotations"]]
     assert missing == [], f"unannotated top-level fields: {missing}"
     assert wire["closing_statement"] == (
-        "The model call happens in the agent/host layer. "
-        "The MCP server does not call the LLM."
+        "The LLM call happens in the Host/Agent; the MCP server does not run an LLM."
     )
 
 
 def test_tool_counts_before_and_after():
     text = (EVID / "tool_counts.md").read_text(encoding="utf-8")
-    assert "Before: 3 tools" in text
-    assert "After: 7 tools" in text
+    assert "Before Server 2" in text
+    assert "After Server 2" in text
+    assert "Number of tools: 3" in text
+    assert "Number of tools: 7" in text
     for name in ("get_policy_version", "get_policy_effective_date",
                  "get_policy_deprecation", "get_policy_metadata"):
         assert name in text
@@ -218,6 +222,8 @@ def test_error_before_after_same_query_both_states():
     assert "ERROR: policy not found" in text          # BEFORE: opaque
     assert "Suggested recovery" in text               # AFTER: recoverable
     assert "MCP server call failed for" in text       # outage stays distinguishable
+    assert "Old tool description" in text            # spec section 11 template
+    assert "New tool description" in text
 
 
 def test_config_diff_shows_only_the_server_entry():
@@ -225,3 +231,144 @@ def test_config_diff_shows_only_the_server_entry():
     assert '+      "name": "HR Policy Registry MCP server",' in text
     assert "RESULT: 0 lines changed" not in text  # that claim lives in agent_diff.txt
     assert "0 deletions" in text or "+    \"hr-policy-registry\":" in text
+
+
+# --- Live MCP behavior (spec section 14, points 1-9) -----------------------
+# One real discovery per test session: the fixture imports tools, which
+# spawns both configured servers from mcp_config.json and runs
+# initialize + tools/list through mcp_host before any assertion runs.
+
+EXPECTED_TOOL_NAMES = [
+    "search_handbook", "get_policy_section", "get_handbook_revisions",
+    "get_policy_version", "get_policy_effective_date",
+    "get_policy_deprecation", "get_policy_metadata",
+]
+
+
+@pytest.fixture(scope="session")
+def live_mcp():
+    """Run one real MCP discovery for the whole test session.
+
+    Returns:
+        tuple: the mcp_host module (holding the live server connections)
+        and the tools module whose TOOL_SCHEMAS came from tools/list.
+    """
+    import mcp_host as host
+    import tools as tools_module
+
+    groups = host.tools_by_server()
+    assert set(groups) == {"hr-handbook", "hr-policy-registry"}, (
+        f"discovery produced unexpected server groups: {list(groups)}"
+    )
+    return host, tools_module
+
+
+def test_live_server1_starts(live_mcp):
+    """Spec 14.1: the server-1 process spawned from config is running."""
+    host, _ = live_mcp
+    assert host._CONNECTIONS["hr-handbook"]._process.poll() is None, (
+        "hr-handbook server process exited"
+    )
+
+
+def test_live_server2_starts(live_mcp):
+    """Spec 14.2: the server-2 process spawned from config is running."""
+    host, _ = live_mcp
+    assert host._CONNECTIONS["hr-policy-registry"]._process.poll() is None, (
+        "hr-policy-registry server process exited"
+    )
+
+
+def test_live_initialize_handshake_and_ping(live_mcp):
+    """Spec 14.3: initialize completed for both servers during discovery
+    (mcp_host fails loudly otherwise); a fresh ping round-trip proves the
+    live JSON-RPC loop still answers."""
+    host, _ = live_mcp
+    response = host._CONNECTIONS["hr-policy-registry"].request("ping", {}, 10)
+    assert response.get("result") == {}
+
+
+def test_live_tools_list_returns_seven_tools(live_mcp):
+    """Spec 14.4: the model-facing list came from tools/list (3 -> 7)."""
+    _, tools_module = live_mcp
+    names = [t["function"]["name"] for t in tools_module.TOOL_SCHEMAS]
+    assert names == EXPECTED_TOOL_NAMES
+
+
+def test_live_server1_tools_discovered(live_mcp):
+    """Spec 14.5: exactly the three handbook tools came from server 1."""
+    host, _ = live_mcp
+    names = [t["name"] for t in host.tools_by_server()["hr-handbook"]]
+    assert names == ["search_handbook", "get_policy_section", "get_handbook_revisions"]
+
+
+def test_live_server2_tools_discovered(live_mcp):
+    """Spec 14.6: exactly the four registry tools came from server 2."""
+    host, _ = live_mcp
+    names = [t["name"] for t in host.tools_by_server()["hr-policy-registry"]]
+    assert names == [
+        "get_policy_version", "get_policy_effective_date",
+        "get_policy_deprecation", "get_policy_metadata",
+    ]
+
+
+def test_live_server2_tools_call_over_wire(live_mcp):
+    """Spec 14.7: a server-2 tools/call round trip, proven by both the
+    returned data and a fresh send/recv frame pair in the MCP traffic log."""
+    _, tools_module = live_mcp
+    trace_path = AGENTIC / "output" / "mcp_trace.jsonl"
+    offset = (
+        len(trace_path.read_text(encoding="utf-8").splitlines())
+        if trace_path.exists() else 0
+    )
+
+    result = tools_module.dispatch_tool(
+        "get_policy_effective_date", {"policy": "remote_work_policy"}
+    )
+    assert result["version"] == "v3.2"
+    assert result["effective_date"] == "2026-08-01"
+
+    fresh = [
+        json.loads(line)
+        for line in trace_path.read_text(encoding="utf-8").splitlines()[offset:]
+    ]
+    sent = next(
+        m for m in fresh
+        if m["server"] == "hr-policy-registry" and m["direction"] == "send"
+        and m["payload"].get("method") == "tools/call"
+        and m["payload"]["params"]["name"] == "get_policy_effective_date"
+    )
+    reply = next(
+        m for m in fresh
+        if m["server"] == "hr-policy-registry" and m["direction"] == "recv"
+        and m["payload"].get("id") == sent["payload"]["id"]
+    )
+    assert "2026-08-01" in reply["payload"]["result"]["content"][0]["text"]
+
+
+def test_live_existing_handbook_tool_still_works(live_mcp):
+    """Spec 14.8: the pre-existing HR tools still execute (local path)."""
+    _, tools_module = live_mcp
+    revisions = tools_module.dispatch_tool("get_handbook_revisions", {})
+    assert len(revisions["revisions"]) == 11
+
+
+def test_live_rewritten_description_in_tools_list(live_mcp):
+    """Spec 14.9: the ONE rewritten docstring is what tools/list serves."""
+    _, tools_module = live_mcp
+    description = next(
+        t["function"]["description"]
+        for t in tools_module.TOOL_SCHEMAS
+        if t["function"]["name"] == "get_policy_section"
+    )
+    assert "USE THIS TOOL WHEN" in description
+    assert "INTERPRETING FAILURES" in description
+
+
+def test_recoverable_error_reaches_the_model():
+    """Spec 14.10: the captured after-transcript shows the model received
+    the recoverable error and acted on it (v3.2) instead of flailing on
+    an opaque failure."""
+    text = (EVID / "error_before_after.md").read_text(encoding="utf-8")
+    assert "Suggested recovery:" in text           # error text the model got
+    assert "has not yet been published" in text    # model's response using it

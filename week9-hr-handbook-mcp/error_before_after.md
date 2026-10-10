@@ -71,6 +71,15 @@ schema list drives selection):
 }
 ```
 
+### Old tool description (as served by `tools/list`)
+
+```text
+Get the full published record of ONE specific version of an HR policy (status, effective date, deprecation info, summary). USE when the user names a policy AND a specific version (e.g. 'remote work policy v4'). REQUIRED: `policy` (registry id) and `version` (exact published key, e.g. v3.2). Returns the version record, or an error if the policy id or version does not exist. For only the current version's metadata use get_policy_metadata; for only a date use get_policy_effective_date.
+```
+
+Verified by the generator against commit `ad3f3d2` (the BEFORE state):
+this description was NOT part of the recovery fix.
+
 ### 4. Original error response
 
     policy not found
@@ -135,10 +144,10 @@ Same tool, same arguments:
 
 ```json
 {
-  "ts": "2026-10-01T12:35:05",
+  "ts": "2026-10-01T12:46:56",
   "request": {
     "jsonrpc": "2.0",
-    "id": 3,
+    "id": 4,
     "method": "tools/call",
     "params": {
       "name": "get_policy_version",
@@ -150,7 +159,7 @@ Same tool, same arguments:
   },
   "response": {
     "jsonrpc": "2.0",
-    "id": 3,
+    "id": 4,
     "result": {
       "content": [
         {
@@ -163,6 +172,17 @@ Same tool, same arguments:
   }
 }
 ```
+
+### New tool description (as served by `tools/list`)
+
+```text
+Get the full published record of ONE specific version of an HR policy (status, effective date, deprecation info, summary). USE when the user names a policy AND a specific version (e.g. 'remote work policy v4'). REQUIRED: `policy` (registry id) and `version` (exact published key, e.g. v3.2). Returns the version record, or an error if the policy id or version does not exist. For only the current version's metadata use get_policy_metadata; for only a date use get_policy_effective_date.
+```
+
+UNCHANGED from the BEFORE state (the generator asserts this against
+commit `ad3f3d2`): the recovery fix changed the tool's error RESPONSE,
+not its description. The one description rewrite in this practical is
+Server 1's `get_policy_section` -- see `docstring_rewrite.md`.
 
 ### 4. New recoverable error response
 

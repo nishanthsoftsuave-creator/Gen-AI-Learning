@@ -8,11 +8,15 @@ extracted verbatim from the session's MCP traffic log
 (`Agentic Ai/output/mcp_trace.jsonl`) -- the tool list is not maintained
 by hand anywhere.
 
-## Before: 3 tools
+## Before Server 2
 
 MCP configuration at capture time: **server one only** (`hr-handbook`),
 i.e. git commits `c6aea49` / `7529bc1` -- before the HR Policy Registry
 MCP server was added.
+
+**Number of tools: 3**
+
+Names:
 
 - search_handbook
 - get_policy_section
@@ -126,13 +130,15 @@ MCP server was added.
 }
 ```
 
-## After: 7 tools
+## After Server 2
 
 MCP configuration at capture time: server one **plus the HR Policy
 Registry MCP server added through configuration** (git commit `63a1226`;
 see `config_diff.txt`).
 
-**After: 7 tools**
+**Number of tools: 7**
+
+Names (grouped by the server that returned them in `tools/list`):
 
 Server 1 -- HR Handbook MCP server (`hr-handbook`), 3 tools:
 

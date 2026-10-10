@@ -1,7 +1,7 @@
 {
   "capture": {
     "server": "HR Policy Registry MCP server (config key: hr-policy-registry)",
-    "captured_at": "2026-10-01T12:44:09",
+    "captured_at": "2026-10-05T11:24:40",
     "transport": "stdio, newline-delimited JSON-RPC 2.0 (MCP)",
     "how": "Dedicated live session against the running server; frames extracted verbatim from Agentic Ai/output/mcp_trace.jsonl send/recv records."
   },
@@ -24,6 +24,9 @@
     "arguments": "Inside tools/call params: a JSON object of arguments for that tool, validated against the tool's inputSchema declared in tools/list.",
     "result": "Successful response payload. initialize result: negotiated protocolVersion, server capabilities, serverInfo. tools/list result: the tools array (name, description, inputSchema per tool). tools/call result: content blocks (type 'text') carrying the tool's output, plus optional isError.",
     "error": "JSON-RPC error payload {code, message} for PROTOCOL-level failures (unknown method, malformed request, parse error). It does not appear in this capture: tool-level failures come back inside result with isError=true instead, so the model can read them as tool output.",
+    "tools": "tools/list result: the array of tool objects (name, description, inputSchema) actually exposed by this MCP server -- the agent builds its model-facing tool list from this response, not from any hard-coded list.",
+    "description": "Per-tool instructions carried to the LLM for tool selection: what the tool does, when to use it, its arguments, and what it returns. Served by the MCP server; the host passes it through unchanged.",
+    "inputSchema": "JSON Schema declaring this tool's arguments; the host converts it to the model's function-calling parameter schema, and tools/call arguments must conform to it.",
     "protocolVersion": "MCP protocol version the client proposes; the server echoes the version it will speak.",
     "capabilities": "Feature declarations. Client: {} (no extras). Server: tools capability with listChanged=false (the tool list does not push change notifications).",
     "serverInfo": "Server identity: name + version reported during initialize.",
@@ -187,5 +190,5 @@
     "decoded_text": "{\"policy\": \"remote_work_policy\", \"version\": \"v3.2\", \"effective_date\": \"2026-08-01\", \"status\": \"active\"}",
     "is_error": false
   },
-  "closing_statement": "The model call happens in the agent/host layer. The MCP server does not call the LLM."
+  "closing_statement": "The LLM call happens in the Host/Agent; the MCP server does not run an LLM."
 }
