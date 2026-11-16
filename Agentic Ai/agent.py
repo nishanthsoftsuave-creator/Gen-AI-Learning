@@ -15,7 +15,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 from budgets import BudgetTracker, TERMINATION_COMPLETED
 from llm_client import chat, GROQ_MODEL
-from tools import TOOL_SCHEMAS, dispatch_tool, ToolError
+from tools import dispatch_tool, model_schemas, ToolError
 from agent_tracing import save_run_trace
 
 SYSTEM_PROMPT = """You are an HR-support assistant for the Soft Suave Employee Handbook. Answer the employee's question about company policy.
@@ -49,11 +49,12 @@ def _message_to_dict(message):
     return entry
 
 
-def run_agent(question, question_id="adhoc", budgets=None, verbose=False):
+def run_agent(question, question_id="adhoc", budgets=None, verbose=False, role_instruction=None,
+              trace_id=None, trace_extra=None):
     tracker = budgets or BudgetTracker()
 
     messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "system", "content": SYSTEM_PROMPT + ("\n\n" + role_instruction if role_instruction else "")},
         {"role": "user", "content": question},
     ]
 
@@ -71,7 +72,7 @@ def run_agent(question, question_id="adhoc", budgets=None, verbose=False):
                 print(f"[Budget] TRIGGERED before iteration {tracker.iterations}: {reason}")
             break
 
-        message, usage = chat(messages, tools=TOOL_SCHEMAS, tool_choice="auto")
+        message, usage = chat(messages, tools=model_schemas(), tool_choice="auto")
         tracker.record_llm_call(usage["input_tokens"], usage["output_tokens"], GROQ_MODEL)
 
         if verbose:
@@ -151,6 +152,8 @@ def run_agent(question, question_id="adhoc", budgets=None, verbose=False):
         termination_reason=termination_reason,
         final_answer=final_answer,
         model=GROQ_MODEL,
+        trace_id=trace_id,
+        extra=trace_extra,
     )
 
     return {

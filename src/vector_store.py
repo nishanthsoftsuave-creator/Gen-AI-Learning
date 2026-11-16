@@ -20,6 +20,8 @@ def store_embeddings(
     # Load PDF text
     text = load_pdf(pdf_path, verbose=verbose)
 
+    source_file = Path(pdf_path).name if pdf_path else "rag_stage1_test_document.pdf"
+
     # Split text into chunks
     chunks = chunk_text(text)
 
@@ -53,7 +55,8 @@ def store_embeddings(
     collection.add(
         ids=ids,
         documents=chunks,
-        embeddings=embeddings.tolist()
+        embeddings=embeddings.tolist(),
+        metadatas=[{"source_file": source_file}] * len(chunks),
     )
 
     if verbose:

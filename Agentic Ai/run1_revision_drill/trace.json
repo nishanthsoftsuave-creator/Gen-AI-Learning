@@ -1,0 +1,21 @@
+{
+  "trace_id": "tr_dc724d3e4324",
+  "timestamp": "2026-10-16T11:09:55.085116+00:00",
+  "timestamp_local": "2026-10-16 16:39:55 Asia/Kolkata",
+  "question": "How many times has the Employee Handbook been revised, and when was the most recent one?",
+  "prompt_version": "rag_v1",
+  "model": "openai/gpt-oss-20b",
+  "answer": "Answer: The Employee Handbook has been revised 8 times. The most recent revision was Revision 8, dated November 2022.",
+  "retrieved_context_ids": ["chunk_97", "chunk_9", "chunk_8"],
+  "spans": [
+    {"name": "retrieval", "latency_seconds": null, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0, "note": "Stage latency was not logged; exact value is unrecoverable."},
+    {"name": "generation", "latency_seconds": null, "input_tokens": 742, "output_tokens": 159, "cost_usd": 0.00010335, "note": "Per-call usage comes from the paired normal_workflow trace; generation-only latency was not logged."},
+    {"name": "tools", "latency_seconds": 0, "input_tokens": 0, "output_tokens": 0, "cost_usd": 0.0}
+  ],
+  "total_elapsed_seconds": 1.1468932000025234,
+  "total_tokens": 901,
+  "total_cost_usd": 0.00010335,
+  "paired_usage_trace_id": "tr_733ca7b21d66",
+  "source_retrieval_trace": "../output/traces/tr_dc724d3e4324.json",
+  "source_usage_trace": "output/traces/tr_733ca7b21d66.json"
+}

@@ -1,0 +1,1 @@
+Assuming the captured query (901 tokens, 1.1469 s end-to-end) represents today's 1 query/minute baseline, at 10× = **10 queries/minute × 901 = 9,010 tokens/minute**, above the documented **8,000 TPM** account limit; the **rate limit** breaks first.

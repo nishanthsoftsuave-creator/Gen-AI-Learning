@@ -1,0 +1,1 @@
+This is proposed A2A AgentCard metadata for the HR orchestrator. The current implementation uses local MCP stdio and does not host the advertised HTTP A2A endpoint yet. No authentication is configured for this local exercise.

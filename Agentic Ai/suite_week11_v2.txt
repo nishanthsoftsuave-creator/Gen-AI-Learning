@@ -1,0 +1,18 @@
+Suite expanded from 1 case to 2 (HR-REV-002-legacy added; its answer is a synthetic fixture, not a logged trace).
+
+## Before fix (no guard)
+FAIL HR-REV-001
+PASS HR-REV-002-legacy
+SUITE BEFORE: 1/2 passed
+
+## RED: old guard (overwrote historical-revision answers) -- the silent regression
+PASS HR-REV-001
+FAIL HR-REV-002-legacy
+SUITE AFTER: 1/2 passed
+
+## GREEN: guard skips questions naming a specific revision (src/revision_guard.py)
+PASS HR-REV-001
+PASS HR-REV-002-legacy
+SUITE AFTER: 2/2 passed
+
+Summary: 1/2 -> 1/2 (regression exposed) -> 2/2

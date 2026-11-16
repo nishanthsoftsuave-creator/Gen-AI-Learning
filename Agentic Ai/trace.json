@@ -1,0 +1,45 @@
+{
+  "trace_id": "tr_5e0d17a94c3b",
+  "timestamp": "2026-10-21T09:14:22.418000+00:00",
+  "user_ref": "u_71de",
+  "category": "leave",
+  "question": "Can technical team members carry forward unused leave?",
+  "answer": "Yes. Technical team members can carry forward up to **12 unused leaves** to the next calendar year; any balance beyond 12 lapses.",
+  "prompt_version": "rag_v1",
+  "model": "openai/gpt-oss-20b",
+  "retrieved_context_ids": [
+    "chunk_47",
+    "chunk_46",
+    "chunk_45"
+  ],
+  "retrieved_sources": [
+    "SS Employee Handbook Updated-2025 (1).pdf"
+  ],
+  "spans": [
+    {
+      "name": "retrieval",
+      "latency_seconds": 0.614928000002692,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "name": "generation",
+      "latency_seconds": 0.7575151999990339,
+      "input_tokens": 822,
+      "output_tokens": 195,
+      "cost_usd": 0.00012014999999999999
+    },
+    {
+      "name": "tools",
+      "latency_seconds": 0.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cost_usd": 0.0
+    }
+  ],
+  "total_latency_seconds": 1.3724,
+  "total_tokens": 1017,
+  "total_cost_usd": 0.00012014999999999999,
+  "provenance": "Planted by Claude for the drill (not a squadmate). Spans and context ids were copied from the real trace tr_91795918c2d0 (same handbook, same leave topic); question, answer, user, timestamp and prompt_version=rag_v1 were set by the plant. See drill_plant_manifest.json."
+}

@@ -18,6 +18,10 @@ _client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 MAX_RATE_LIMIT_RETRIES = 8
 
+# Cumulative seconds, so a caller can split a request's latency into real model time and
+# time spent sleeping on 429s (read before/after a request; single-threaded use only).
+STATS = {"model_call_seconds": 0.0, "rate_limit_wait_seconds": 0.0}
+
 
 def _retry_after_seconds(error, attempt):
     """Read the Retry-After header Groq sends on 429s; fall back to
@@ -51,8 +55,10 @@ def chat(messages, tools=None, tool_choice=None, temperature=0.3):
 
     attempt = 0
     while True:
+        call_started = time.monotonic()
         try:
             response = _client.chat.completions.create(**kwargs)
+            STATS["model_call_seconds"] += time.monotonic() - call_started
             break
         except RateLimitError as error:
             attempt += 1
@@ -60,6 +66,7 @@ def chat(messages, tools=None, tool_choice=None, temperature=0.3):
                 raise
             wait_seconds = _retry_after_seconds(error, attempt)
             print(f"[llm_client] rate limited, retrying in {wait_seconds:.1f}s (attempt {attempt})")
+            STATS["rate_limit_wait_seconds"] += wait_seconds
             time.sleep(wait_seconds)
 
     usage = response.usage

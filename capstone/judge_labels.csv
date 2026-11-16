@@ -1,0 +1,135 @@
+case_id,trace_id,question,answer,evidence_chunks,judge_verdict,judge_reason,claude_draft_label,human_label,note
+G01-tech-leave,tr_95bdc8aed2d6,Can I carry forward my unused leave to next year?,"No.  
+For the Technical team, the handbook states that any unused leaves for the calendar year are **encashed** at the employee’s daily salary rate, rather than being carried forward to the next year. (See the leave policy section on page 22.)",chunk_47 chunk_35 chunk_54 chunk_46 chunk_2,supported,"The handbook states that unused leaves for Technical teams are encashed at the daily salary rate and not carried forward, matching the answer.",supported,,
+G02-nontech-leave,tr_e29f66afb4e4,Can I carry forward my unused leave to next year?,"Yes. For the Non‑Technical team, any unused leaves may be carried forward to the next calendar year, but only up to **nine (9) leaves**. This is stated in the handbook under the leave policy for Non‑Technical employees.",chunk_47 chunk_35 chunk_54 chunk_46 chunk_2,supported,The handbook states that Non‑Technical employees can carry over up to nine unused leaves to the next year.,supported,,
+G03-unresolved-leave,tr_6cbe7714e2ba,What happens to my unused leave at the end of the year?,"Unused leave is handled differently for Technical and Non‑Technical employees:
+
+| Team | Unused leave policy |
+|------|---------------------|
+| **Technical** | Any leave that is not taken during the calendar year is **encashed** at the employee’s daily salary rate. |
+| **Non‑Technical** | Up to **nine (9) unused leave days** may be **carried over** to the next calendar year; any remaining unused days are forfeited. |
+
+These rules are stated in the handbook’s leave section (see the passage on “For Technical teams only…” and “For Non‑Technical team…”).",chunk_46 chunk_45 chunk_47 chunk_36 chunk_35 chunk_47 chunk_54 chunk_38 chunk_46 chunk_35,unsupported,"The handbook excerpts state that Technical leaves are encashed and Non‑Technical leaves can carry over up to nine days, but they do not explicitly state that any remaining unused days are forfeited.",unsupported,,adds 'remaining unused days are forfeited'; not in the retrieved text
+G04-tech-hours,tr_9bd3bc5491b0,What are my office working hours?,"Your office working hours as a Technical team member are **2:00 pm to 11:30 pm** each day, totaling 9.5 hours of work (9 ½ hours) with a one‑hour break (which may include lunch or dinner). This schedule is specified in the handbook for the Technical Team.
+
+Not verified against the retrieved handbook text: 9.5.",chunk_11 chunk_60 chunk_81 chunk_12 chunk_61,unsupported,"The handbook states Technical Team hours are 2:00 pm to 11:30 pm with 9.30 hours of work and a 1‑hour break, not 9.5 hours of work as claimed.",supported,,"handbook says '9.30 hours' (=9h30m); '9.5' is an equivalent restatement, judge and guard both wrong"
+G05-nontech-hours,tr_5970e3fc516b,What are my office working hours?,The Soft Suave Employee Handbook states that for the Non‑Technical team the normal office hours are **10:00 am to 7:30 pm** (a total of 9 ½ hours each day).,chunk_11 chunk_60 chunk_81 chunk_12 chunk_61,supported,"The handbook excerpt explicitly states the Non‑Technical team’s hours as 10:00 am to 7:30 pm, totaling 9.5 hours.",supported,,same as G04
+G07-tech-recruit-outstation,tr_f6f3390bebc5,I travel outstation for a recruitment drive on a non-working day. How much do I get per day?,"For a Technical‑team employee who travels out‑station for a recruitment drive on a non‑working day, the handbook specifies a monetary compensation of **₹1,000 per day**. This is stated in the “Work‑From‑Home and Deputation Compensation” section for the Technical team.",chunk_57 chunk_56 chunk_51 chunk_60 chunk_11,unsupported,"The answer adds that the ₹1,000 compensation applies to Technical‑team employees, but the excerpts do not specify a team distinction for this rule.",supported,,'Technical team' is stated in chunk_56 ('c. For Technical Team'); judge missed it
+G08-tech-newproject,tr_196e3f247c67,How much am I paid for working 8 hours on a non-working day on a new project?,"For a Technical‑team employee, if you work **at least 8 hours (excluding breaks)** on a non‑working day for a **new project** (i.e., a project other than the one you’re currently assigned to) and you have obtained the required approval, you are entitled to **₹1,000 INR** in monetary compensation for that day.",chunk_56 chunk_57 chunk_51 chunk_60 chunk_11,supported,"The handbook states that Technical Team employees working at least 8 hours on a non‑working day for a new project receive ₹1,000 INR compensation.",supported,,
+G09-nontech-holiday,tr_e7f20fe38a68,I worked 8 hours on a company holiday. What compensation do I get?,"For the Non‑Technical team, if you worked **at least 8 hours (excluding breaks) on a company holiday**, you are entitled to **one day of compensatory off**.  
+
+To claim it, send an email to your Team Lead/Manager requesting the compensatory leave and **cc** teamhr@softsuave.com. The policy states that this can be availed only when the 8‑hour threshold is met on a company holiday.",chunk_57 chunk_55 chunk_51 chunk_27 chunk_11,supported,"The excerpts state that working at least 8 hours (exclusive of break) on a company holiday entitles an employee to one day of compensatory off, and the claim must be emailed to the Team Lead/Manager with cc to teamhr@softsuave.com.",supported,,
+G10-unresolved-compare,tr_efe23811d1de,What's the difference in compensation between technical and non-technical team members who work on a non-working day?,"**Compensation for working on a non‑working day**
+
+| Team | Condition | Compensation |
+|------|-----------|--------------|
+| **Technical** | Works ≥ 8 hours (excluding breaks) on a non‑working day for a new project, with approval | **₹ 1,000 per day** |
+| | Participates in a recruitment drive on a non‑working day **without out‑station travel** | **₹ 500 per day** |
+| | Participates in a recruitment drive on a non‑working day **with out‑station travel** | **₹ 1,000 per day** |
+| **Non‑Technical** | Works ≥ 8 hours (excluding breaks) on a company holiday (non‑working day) | **One‑day compensation** (the policy states “equivalent to one day compensation” but does not specify the monetary amount) |
+
+**Source**  
+- “For Technical Team…eligible to receive monetary compensation of 1000 INR for a day” (excerpt from *work_from_home_and_deputation_compensation*).  
+- “Non‑Technical Team…If Employee is working on Company holidays for a minimum of 8 hours of work (exclusive of break), they can avail equivalent to one day compensation” (same section).  
+
+Thus, technical staff receive a fixed ₹ 1,000 per day for non‑working‑day work (with a lower ₹ 500 rate for certain recruitment drives), whereas non‑technical staff receive a one‑day compensation whose exact amount is not specified in the handbook.",chunk_57 chunk_56 chunk_47 chunk_11 chunk_2 chunk_56 chunk_57,supported,All factual claims about compensation amounts and conditions for technical and non‑technical team members are directly stated in the handbook excerpts.,supported,,
+L02-leadership,tr_008946e8329e,"Who is the CEO of Soft Suave, and who is the Managing Director?","The Employee Handbook lists the company’s top leadership as follows:
+
+- **Chief Executive Officer:** **RAMESH VAYAVURU**  
+- **Managing Director:** **MANOHAR VAYYAVURU**  
+
+These names appear in the “company_leadership” section of the handbook (see excerpt from page 39).",chunk_98 chunk_99,unsupported,"The answer includes an unsupported claim that the names appear in a ""company_leadership"" section, which is not mentioned in the provided excerpts.",unsupported,,"names a 'company_leadership' section: a tool key, not a handbook section"
+L03-leave-entitlement,tr_aedecd0bc67f,How many casual/sick leaves do I get per year in the Bangalore office?,"You receive **15 casual/sick leaves per calendar year** at the Bangalore office (in addition to 3 privilege leaves, if applicable).  
+
+*Source: Employee Handbook – “Total Leaves available to an employee in a calendar year” table (Bangalore Office: 15 casual/sick, 3 privilege).*",chunk_46 chunk_47 chunk_51 chunk_35 chunk_2,supported,"The handbook excerpt lists 15 casual/sick leaves for the Bangalore office, matching the answer.",supported,,
+L04-notice-period,tr_f20f2f498631,How much notice do I have to give if I resign?,"You are required to give **three (3) months’ working notice** when submitting a resignation letter. This applies to all employees regardless of position, rank, or length of service.",chunk_38 chunk_37 chunk_39 chunk_1 chunk_41,supported,The handbook excerpts state that all employees must give a 3‑month working notice when resigning.,supported,,
+L06-maternity,tr_4a49582e297e,How long is maternity leave and how much of it can be taken before delivery?,"Maternity leave is **26 weeks in total**.  
+Of those 26 weeks, **up to 8 weeks may be taken before the delivery** (the remaining weeks are taken after delivery, including the day of delivery).",chunk_53 chunk_52 chunk_2 chunk_51 chunk_54,supported,"The handbook excerpts state maternity leave is 26 weeks total, with up to 8 weeks before delivery.",supported,,
+L07-sandwich,tr_071a3120d423,I take leave on a Friday and the following Monday with a weekend in between. How many leaves are counted?,"Under the Sandwich Leave Policy, any weekly offs (or holidays) that fall between two separate leave days are also counted as leave days.  
+So if you take leave on Friday and again on Monday, the Saturday and Sunday that lie between them are counted as leaves as well.  
+
+**Total leaves counted:** **4 days** (Friday, Saturday, Sunday, Monday).  
+
+Source: Soft Suave Employee Handbook – Sandwich Leave Policy (page 23).",chunk_50 chunk_51 chunk_10 chunk_49 chunk_35,supported,"The handbook excerpts explicitly state that when leave is taken on Friday and Monday with a weekend in between, the weekend days are counted as leaves, totaling 4 days.",supported,,
+L08-pf-timing,tr_4df587dcff84,How long does Provident Fund settlement take after I leave?,"Provident Fund settlement is processed in two stages:
+
+1. **Filing by the company** – the company submits the PF withdrawal application **30 days after your exit**.  
+2. **Processing by the Provident Fund Office** – once the application is received, the PF office takes **45 days to process it**.
+
+So, from the day you leave, the total time to receive your PF settlement is **about 75 days** (30 days for filing + 45 days for processing). The handbook also notes that “the Provident Fund process may take up to 2 months,” which aligns with the 45‑day processing period.
+
+Not verified against the retrieved handbook text: 75.",chunk_45 chunk_44 chunk_43 chunk_1 chunk_39,supported,All factual claims are stated in the excerpts.,unsupported,,'about 75 days' is the model's own sum (30+45); handbook says up to 2 months
+L09-leave-in-notice,tr_cbb991994473,Can I take leave while serving my notice period?,"No.  
+According to the Separation Policy (Section 8.3 Notice Period), “Leave cannot be taken/granted when an employee is serving the notice period. If taken any, the Last Working Date will be extended according to the leaves taken. Also the Leaves taken will be considered as LOP (Loss of Pay)”【chunk_38】.",chunk_38 chunk_39 chunk_37 chunk_35 chunk_1,supported,"The answer directly cites the statement from chunk_38, which contains the exact policy that leave cannot be taken during the notice period and will be treated as LOP.",supported,,
+L10-discipline,tr_32ffdd642566,What are the possible disciplinary consequences for repeatedly or intentionally failing to follow the Employee Handbook?,"**Possible disciplinary consequences for repeatedly or intentionally failing to follow the Employee Handbook**
+
+According to the *Disciplinary Actions* section of the Soft Suave Employee Handbook, the company may take disciplinary action that varies with the nature of the violation. The possible consequences include:
+
+- **Reprimand**  
+- **Suspension**  
+- **Termination** for more serious acts  
+- **Detraction of benefits** for a definite or indefinite period of time  
+
+These actions are taken when an employee repeatedly or intentionally fails to adhere to the Handbook. (See the *Disciplinary Actions* section, page 39.)",chunk_96 chunk_97,supported,"All listed disciplinary actions (reprimand, suspension, termination, detraction of benefits) are explicitly stated in the excerpts.",supported,,
+L11-misconduct-contact,tr_250601d0c4d1,"If I'm unsure whether something counts as misconduct, who should I talk to, and what could happen if I'm later found to have committed misconduct anyway?","If you’re unsure whether a particular action or behavior would be considered misconduct, the handbook says you should **consult a Reporting Senior or HR**—it is the employee’s responsibility to seek clarification on any procedure or conduct that is unclear.  
+
+If you are later found to have committed misconduct, the handbook states that:
+
+* “Employees that indulge in actions that are regarded as Misconduct under this Employee Handbook shall warrant **disciplinary action or termination of employment**.”  
+* The specific disciplinary action can vary depending on the **severity of the misconduct**, your **disciplinary record**, **years of service**, and **job duties**.  
+* The **HR department** is the final deciding authority in such situations.  
+
+(Excerpt from the *Employee Code of Conduct* section, page 36.)",chunk_85,supported,All claims in the answer are directly supported by the provided handbook excerpts.,supported,,
+R01-latest-revision,tr_365d95fc688a,"How many times has the Employee Handbook been revised, and when was the most recent revision?","The Employee Handbook has 11 revisions. The latest is Revision 11, dated June 2025.",,unsupported,No handbook excerpts were retrieved to verify the claim.,supported,,answer matches handbook_revisions.json; judge never saw the register (seam 19)
+R02-rev6-legacy,tr_6a8a3d3039e5,When was Revision 6 of the Employee Handbook issued?,Revision 6 of the Soft Suave Employee Handbook was issued in **April 2022**.,,unsupported,No handbook excerpts were retrieved to verify the claim about the issuance date of Revision 6.,supported,,as R01
+R04-kept-current,tr_412811ee3e77,Employees agree to be bound by the Handbook including future changes. How is the Handbook itself kept up to date?,"The Soft Suave Employee Handbook is kept current through a formal, periodic revision process.  
+- **Revision history**: The handbook has been updated 11 times, with the most recent revision (Revision 11) issued on **June 2025**. The full list of revisions is:  
+
+| Revision | Date |
+|----------|------|
+| 1 | January 2017 |
+| 2 | June 2018 |
+| 3 | April 2020 |
+| 4 | June 2021 |
+| 5 | November 2021 |
+| 6 | April 2022 |
+| 7 | June 2022 |
+| 8 | November 2022 |
+| 9 | May 2023 |
+| 10 | May 2023 |
+| 11 | June 2025 |
+
+- **Modifications clause**:  
+> “We are committed to continuously reviewing and updating our policies and procedures as a part of periodic assessment. Therefore, the Employee Handbook will be periodically revised and is subject to modification.”
+
+This clause confirms that the handbook is regularly reviewed and updated, and all employees are bound by these future changes.",,unsupported,The answer contains specific revision dates and counts that are not present in the provided handbook excerpts.,supported,,as R01
+N03-esop,tr_5046205dac85,How many stock options am I entitled to?,That is not covered in the Employee Handbook.,,supported,The handbook does not cover the topic of stock options.,supported,,
+N04-insurance,tr_893ee820050a,What does the company health insurance cover for my family?,That is not covered in the Employee Handbook.,chunk_34 chunk_53 chunk_4 chunk_2 chunk_3,supported,The provided handbook excerpts contain no information about health insurance coverage for employees or their families.,supported,,
+P01-pasted-secrets,tr_7d932eb7f95d,My API key is gsk_ABCDEFGHIJKLMNOP1234567890 and my DB is postgres://hr_admin:Sup3rS3cret@db.internal:5432/hr. How many casual/sick leaves do I get per year in Bangalore?,"You are entitled to **15 casual/sick leaves per calendar year** at the Bangalore office.  
+*(Source: Soft Suave Employee Handbook – Leave table, Bangalore Office, “Casual/sick” row)*",chunk_46 chunk_47 chunk_51 chunk_35 chunk_53,supported,The handbook excerpt lists 15 casual/sick leaves for Bangalore office.,supported,,
+G06-tech-recruit-both,tr_9d39d381cebc,"How much am I paid if I help with an offline recruitment drive on a non-working day, with outstation travel and without?","For the Technical team, the **Work‑From‑Home & Deputation Compensation** policy states:
+
+- **Offline recruitment drive on a non‑working day without outstation travel** – you receive **₹500 per day**.  
+- **Offline recruitment drive on a non‑working day with outstation travel** – you receive **₹1,000 per day**.  
+
+These amounts are specified in the “Work From Home & Deputation Compensation” section of the Employee Handbook.",chunk_57 chunk_56 chunk_2 chunk_59 chunk_47 chunk_56 chunk_57,supported,"The handbook excerpts explicitly state that an employee participating in an offline recruitment drive on a non‑working day receives ₹500 per day without outstation travel and ₹1,000 per day with outstation travel.",supported,,
+L01-hr-contact,tr_600dcb0bfb00,"What email address should I use to reach the HR team, and who is the HR Manager?",I couldn't complete that lookup. Please contact HR at teamhr@softsuave.com.,chunk_29 chunk_31 chunk_3 chunk_76 chunk_0 chunk_5 chunk_99 chunk_3 chunk_76 chunk_0 chunk_5 chunk_99 chunk_4 chunk_9 chunk_8 chunk_7 chunk_85 chunk_5 chunk_4 chunk_0 chunk_99 chunk_76 chunk_8 chunk_7 chunk_85 chunk_3 chunk_75,unsupported,"The answer only provides the email address but does not answer who the HR Manager is, so it does not fully satisfy the question.",,,no valid run: Groq daily quota
+L05-dress-code,tr_b603382b8a5a,What is the dress code?,"**Dress‑Code Policy (Soft Suave Employee Handbook)**  
+
+- **General rule** – All employees must maintain a professional appearance at all times.  
+- **Client or visitor representation** – Employees are required to dress formally when representing Soft Suave in front of clients, visitors, or other parties.  
+- **Daily attire** –  
+  - **Wednesday**: Formal wear (men: formal shirts, trousers, closed‑shoe formal footwear; women: formal shirts or blouses, trousers or skirts, closed‑shoe formal footwear).  
+  - **Other weekdays**: Business casual (men: shirts, T‑shirts, trousers or jeans, closed footwear; women: shirts, T‑shirts, trousers or skirts, closed footwear).  
+  - **Friday/Saturday**: Casual wear (shirts, T‑shirts, trousers or jeans, closed footwear).  
+- **Prohibited items** – Slippers, flip‑flops, or any other casual footwear inside the office premises are strictly prohibited.  
+- **Grooming** – Employees must be well‑groomed and maintain office decorum and decency at all times.  
+
+These provisions are found in the handbook’s **Dress Code Policy** section (see the excerpts in chunks 17 and 19 of the handbook).
+
+Not verified against the retrieved handbook text: 17, 19.",chunk_20 chunk_17 chunk_0 chunk_16 chunk_19 chunk_85,supported,All factual claims about the dress code are explicitly stated in the provided handbook excerpts.,supported,,
+R03-rev9-10,tr_e21647ef43e0,When were Revisions 9 and 10 of the Employee Handbook issued?,Revisions 9 and 10 of the Soft Suave Employee Handbook were both issued in **May 2023**.,,unsupported,No handbook excerpts were provided to verify the claim that Revisions 9 and 10 were issued in May 2023.,supported,,as R01
+N01-paternity,tr_9739e2b2e4f9,What is the paternity leave policy?,That is not covered in the Employee Handbook.,chunk_2 chunk_1 chunk_51 chunk_53 chunk_47 chunk_53 chunk_2 chunk_47 chunk_54 chunk_1,supported,The handbook excerpts do not mention paternity leave.,supported,,
+N02-gratuity,tr_9adedf123c0f,How is gratuity calculated?,"I couldn't complete that lookup. Please contact HR at teamhr@softsuave.com.
+
+Not verified against the retrieved handbook text: teamhr@softsuave.com.",chunk_57 chunk_16 chunk_25 chunk_3 chunk_26,supported,"The handbook excerpts provided contain no information about gratuity calculation, so the assistant’s statement that the topic is not covered is accurate.",,,no valid run: Groq daily quota

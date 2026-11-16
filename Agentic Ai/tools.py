@@ -17,6 +17,8 @@ rather than a hand-cleaned rewrite, and says so, so nothing here is
 invented or silently corrected.
 """
 
+import contextvars
+import copy
 import json
 import os
 import sys
@@ -81,9 +83,48 @@ SUPPORTED_SECTIONS = list(POLICY_SECTIONS.keys())
 
 _collection = None
 
+# Employee group scoping (capstone). Chunks carry metadata group in
+# {technical, non_technical, both, all} (capstone/tag_index.py).
+GROUPS = ("technical", "non_technical")
+GROUP_SCOPED_TOOLS = {"search_handbook", "get_policy_section"}
+_UNSET = object()
+# In the agent process the entry point sets this, and dispatch_tool then forces it onto every
+# group-scoped call, so the model cannot widen or switch the caller's group. None = unresolved.
+CALLER_GROUP = contextvars.ContextVar("caller_group", default=_UNSET)
+# When a list is set here, dispatch_tool appends the chunks every tool returned (citations).
+EVIDENCE = contextvars.ContextVar("evidence", default=None)
+
 
 class ToolError(Exception):
     pass
+
+
+def _check_group(employee_group):
+    if employee_group not in (None, *GROUPS):
+        raise ToolError(f"Unsupported employee_group '{employee_group}'. Use one of {list(GROUPS)} or omit it.")
+
+
+def _group_where(employee_group):
+    """Chroma filter: the caller's group plus chunks that apply to both groups or to everyone."""
+    return {"group": {"$in": [employee_group, "both", "all"]}} if employee_group else None
+
+
+def _metas(ids):
+    if not ids:
+        return {}
+    data = _get_collection().get(ids=ids, include=["metadatas"])
+    return {i: m or {} for i, m in zip(data["ids"], data["metadatas"])}
+
+
+def _trim_foreign_lead(text, meta, group):
+    """Drop the chunk's leading span when it is the tail of the OTHER group's rule.
+
+    The chunker repeats text across a boundary, so a chunk can open with the end of the technical
+    rule and then switch to the non-technical section (chunk_57). Tagging such a chunk "both" lets
+    the technical caller see the rule, but the non-technical caller must not get that tail.
+    """
+    lead_group, lead_chars = meta.get("lead_group"), meta.get("lead_chars", 0)
+    return text[lead_chars:] if group and lead_chars and lead_group != group else text
 
 
 def _get_collection():
@@ -105,19 +146,28 @@ def _validate_section(section):
 # Tool 1: search_handbook
 # ---------------------------------------------------------------------------
 
-def search_handbook(query, top_k=3):
+def search_handbook(query, top_k=3, employee_group=None):
     """Find relevant passages in the Employee Handbook for a natural-
     language question (narrative policy explanations, procedures)."""
 
+    _check_group(employee_group)
     collection = _get_collection()
     embedding = embedding_model.encode(query).tolist()
 
-    results = hybrid_retrieve(collection, query, embedding, top_k=top_k)
+    results = hybrid_retrieve(
+        collection, query, embedding, top_k=top_k, where=_group_where(employee_group)
+    )
+    metas = _metas([r["chunk_id"] for r in results])
 
     return {
         "query": query,
+        "employee_group": employee_group,
         "result_count": len(results),
-        "results": [{"chunk_id": r["chunk_id"], "text": r["text"]} for r in results],
+        "results": [
+            {"chunk_id": r["chunk_id"], "page": metas.get(r["chunk_id"], {}).get("page", 0),
+             "text": _trim_foreign_lead(r["text"], metas.get(r["chunk_id"], {}), employee_group)}
+            for r in results
+        ],
     }
 
 
@@ -125,22 +175,27 @@ def search_handbook(query, top_k=3):
 # Tool 2: get_policy_section
 # ---------------------------------------------------------------------------
 
-def get_policy_section(section):
+def get_policy_section(section, employee_group=None):
     """Retrieve the full, verbatim text of one specific, named Handbook
     section, located by its real anchor phrase rather than by similarity
     search."""
 
     _validate_section(section)
+    _check_group(employee_group)
 
     anchor = " ".join(POLICY_SECTIONS[section]["anchor"].lower().split())
     collection = _get_collection()
-    data = collection.get(include=["documents"])
+    get_kwargs = {"include": ["documents", "metadatas"]}
+    where = _group_where(employee_group)
+    if where:
+        get_kwargs["where"] = where
+    data = collection.get(**get_kwargs)
 
     matches = []
     seen_prefixes = set()
-    for chunk_id, doc in sorted(
-        zip(data["ids"], data["documents"]),
-        key=lambda pair: int(pair[0].split("_")[1]),
+    for chunk_id, doc, meta in sorted(
+        zip(data["ids"], data["documents"], data["metadatas"]),
+        key=lambda item: int(item[0].split("_")[1]),
     ):
         normalized_doc = " ".join(doc.lower().split())
         if anchor in normalized_doc:
@@ -148,10 +203,12 @@ def get_policy_section(section):
             if prefix in seen_prefixes:
                 continue  # the source chunker overlaps consecutive chunks; skip near-duplicates
             seen_prefixes.add(prefix)
-            matches.append({"chunk_id": chunk_id, "text": doc})
+            matches.append({"chunk_id": chunk_id, "page": (meta or {}).get("page", 0),
+                            "text": _trim_foreign_lead(doc, meta or {}, employee_group)})
 
     return {
         "section": section,
+        "employee_group": employee_group,
         "summary": POLICY_SECTIONS[section]["summary"],
         "found": len(matches) > 0,
         "excerpts": matches[:2],
@@ -244,20 +301,49 @@ def _dispatch_mcp_tool(name, arguments):
         return {"text": text}
 
 
+def model_schemas():
+    """Tool schemas shown to the model.
+
+    Once the entry point has set the caller's group, dispatch_tool forces it, so the model must not
+    see `employee_group`: a model that fills it with null gets a 400 tool_use_failed from Groq
+    (4 of 30 cases in the first integrated run). MCP clients outside the agent still see it.
+    """
+    if CALLER_GROUP.get() is _UNSET:
+        return TOOL_SCHEMAS
+    schemas = copy.deepcopy(TOOL_SCHEMAS)
+    for schema in schemas:
+        schema["function"]["parameters"].get("properties", {}).pop("employee_group", None)
+    return schemas
+
+
 def dispatch_tool(name, arguments):
-    if name not in TOOL_FUNCTIONS:
+    arguments = _normalize_zero_arg_call(name, arguments)
+    caller_group = CALLER_GROUP.get()
+    if caller_group is not _UNSET and name in GROUP_SCOPED_TOOLS and isinstance(arguments, dict):
+        arguments = {**arguments, "employee_group": caller_group}
+
+    # HR_VIA_MCP=1 (capstone) sends the handbook tools through the discovered MCP server too,
+    # so the group and trace id cross a real hop instead of a local function call.
+    over_mcp = name not in TOOL_FUNCTIONS or (
+        os.environ.get("HR_VIA_MCP") and _mcp_call_tool and name in known_tools()
+    )
+    if over_mcp:
         if _mcp_call_tool is None:
             raise ToolError(f"Unknown tool '{name}'.")
-        return _dispatch_mcp_tool(name, arguments)
+        result = _dispatch_mcp_tool(name, arguments)
+    else:
+        try:
+            result = TOOL_FUNCTIONS[name](**arguments)
+        except ToolError:
+            raise
+        except TypeError as error:
+            raise ToolError(f"Bad arguments for tool '{name}': {error}") from error
 
-    arguments = _normalize_zero_arg_call(name, arguments)
-
-    try:
-        return TOOL_FUNCTIONS[name](**arguments)
-    except ToolError:
-        raise
-    except TypeError as error:
-        raise ToolError(f"Bad arguments for tool '{name}': {error}") from error
+    evidence = EVIDENCE.get()
+    if evidence is not None and isinstance(result, dict):
+        for chunk in result.get("results", []) + result.get("excerpts", []):
+            evidence.append({"tool": name, **chunk})
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -289,6 +375,14 @@ TOOL_SCHEMAS = [
                     "top_k": {
                         "type": "integer",
                         "description": "Number of ranked passages to return. Defaults to 3.",
+                    },
+                    "employee_group": {
+                        "type": "string",
+                        "enum": list(GROUPS),
+                        "description": (
+                            "Caller's employee group. Only passages for this group (or for "
+                            "everyone) are returned. Omit when the group is unknown."
+                        ),
                     },
                 },
                 "required": ["query"],
@@ -335,6 +429,11 @@ TOOL_SCHEMAS = [
                         "type": "string",
                         "enum": SUPPORTED_SECTIONS,
                         "description": "Exact section to retrieve.",
+                    },
+                    "employee_group": {
+                        "type": "string",
+                        "enum": list(GROUPS),
+                        "description": "Caller's employee group; omit when unknown.",
                     },
                 },
                 "required": ["section"],

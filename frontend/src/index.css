@@ -675,8 +675,13 @@ button {
 }
 
 .race-intro {
-  max-width: 900px;
-  margin: 0 auto 20px;
+  max-width: 1100px;
+  margin: 0 auto 22px;
+  padding: 22px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
 }
 
 .race-intro p {
@@ -722,8 +727,8 @@ button {
 .race-form {
   display: flex;
   gap: 10px;
-  max-width: 900px;
-  margin: 0 auto 16px;
+  max-width: 1100px;
+  margin: 0 auto 24px;
 }
 
 .race-form input {
@@ -767,7 +772,7 @@ button {
 }
 
 .race-error {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto 16px;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
@@ -779,7 +784,7 @@ button {
 }
 
 .race-loading {
-  max-width: 900px;
+  max-width: 1100px;
   margin: 0 auto 20px;
   display: flex;
   align-items: center;
@@ -850,8 +855,8 @@ button {
 
 .race-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .race-panel {
@@ -859,7 +864,7 @@ button {
   border: 1px solid var(--line);
   border-top: 3px solid var(--line-strong);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 18px;
   box-shadow: var(--shadow-card);
 }
 
@@ -867,8 +872,12 @@ button {
   border-top-color: var(--rust);
 }
 
-.race-panel-workflow {
+.race-panel-normal {
   border-top-color: var(--teal);
+}
+
+.race-panel-multi-agent {
+  border-top-color: var(--brass);
 }
 
 .race-panel.winner {
@@ -877,15 +886,29 @@ button {
 
 .race-panel-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 10px;
   margin-bottom: 10px;
+}
+
+.race-panel-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .race-panel-label {
   font-weight: 700;
-  flex: 1;
+  line-height: 1.25;
+}
+
+.race-panel-description {
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  line-height: 1.45;
 }
 
 .race-panel-crown {
@@ -1074,11 +1097,29 @@ button {
 }
 
 @media (max-width: 760px) {
+  .race-view {
+    padding: 18px 14px;
+  }
+  .race-intro {
+    padding: 18px;
+  }
+  .race-form {
+    flex-direction: column;
+  }
+  .race-form button {
+    min-height: 44px;
+  }
   .race-columns {
     grid-template-columns: 1fr;
   }
   .race-metrics {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 761px) and (max-width: 1000px) {
+  .race-columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

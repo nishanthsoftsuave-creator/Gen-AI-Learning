@@ -18,6 +18,7 @@ if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
 from tracing import create_trace_id  # noqa: E402  (reused from src/tracing.py)
+from redact import redact_obj  # noqa: E402
 
 TRACE_DIR = AGENTIC_DIR / "output" / "traces"
 TRACE_DIR.mkdir(parents=True, exist_ok=True)
@@ -38,8 +39,13 @@ def save_run_trace(
     termination_reason,
     final_answer,
     model,
+    trace_id=None,
+    extra=None,
 ):
-    trace_id = create_trace_id()
+    """`trace_id`: reuse the id minted at the entry point so one id spans every hop.
+    `extra`: additional fields (group, evidence, spans) merged in after redaction.
+    """
+    trace_id = trace_id or create_trace_id()
 
     trace = {
         "trace_id": trace_id,
@@ -59,6 +65,10 @@ def save_run_trace(
         "termination_reason": termination_reason,
         "final_answer": final_answer,
     }
+    # Redact on write: questions can contain pasted keys, and the model may echo them into
+    # tool arguments or the answer. `extra` is merged afterwards (it holds handbook text).
+    trace = redact_obj(trace)
+    trace.update(extra or {})
 
     trace_file = TRACE_DIR / f"{trace_id}.json"
     trace_file.write_text(

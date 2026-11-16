@@ -14,6 +14,10 @@ existing Python functions; the model call lives in the agent/host layer.
 import json
 import os
 import sys
+import time
+from pathlib import Path
+
+AUDIT_PATH = Path(__file__).resolve().parent / "output" / "mcp_audit.jsonl"
 
 # This process is an MCP *server*: it must never act as an MCP client, so
 # tools.py skips its MCP-host initialization here (this also makes running
@@ -75,6 +79,27 @@ def _execute(name, arguments):
     return json.dumps(result, ensure_ascii=False), False
 
 
+def _audit(trace_id, tool, arguments, started, is_error):
+    """One line per tools/call so a request can be followed across the MCP hop.
+
+    Logs the trace id, tool, group and timing only: never the query text, which may hold secrets.
+    """
+    line = {
+        "ts": time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()),
+        "trace_id": trace_id,
+        "tool": tool,
+        "employee_group": arguments.get("employee_group"),
+        "latency_ms": round((time.monotonic() - started) * 1000, 1),
+        "is_error": bool(is_error),
+    }
+    try:
+        AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with open(AUDIT_PATH, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(line) + "\n")
+    except OSError as error:
+        print(f"[mcp-server] audit write failed: {error}", file=sys.stderr)
+
+
 def _send(message):
     """Write one JSON-RPC message to stdout (the MCP stdio transport)."""
     sys.stdout.write(json.dumps(message, ensure_ascii=True) + "\n")
@@ -124,16 +149,20 @@ def handle(message):
         if not isinstance(name, str) or name not in {t["name"] for t in _catalog()}:
             _respond_error(request_id, -32602, f"Unknown tool: {name!r}")
             return
+        started = time.monotonic()
+        trace_id = (params.get("_meta") or {}).get("trace_id")
         try:
             text, is_error = _execute(name, arguments)
         except Exception as error:
             # Tool-level failures are isError results, not protocol
             # errors: the model must be able to read the message.
+            _audit(trace_id, name, arguments, started, True)
             _respond_ok(request_id, {
                 "content": [{"type": "text", "text": str(error)}],
                 "isError": True,
             })
             return
+        _audit(trace_id, name, arguments, started, is_error)
         result = {"content": [{"type": "text", "text": text}]}
         if is_error:
             result["isError"] = True

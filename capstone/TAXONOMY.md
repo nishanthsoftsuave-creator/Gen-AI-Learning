@@ -1,0 +1,19 @@
+# Error taxonomy, re-scored on the integrated system
+
+Re-scored 2026-10-30. Denominator is the 30-case run after the group fix and before the schema/guard fixes (`output/run2_before_schema_fix/`, all 30 rows valid) unless stated. Group-bleed numbers come from the pre-fix run and the deterministic retrieval check. Traces are in `Agentic Ai/output/traces/<id>.json`.
+
+**Modes marked NEW did not exist in the parts (Week 3-4 RAG, Week 7 agent, Week 9 MCP). They were created by wiring them together.**
+
+| # | Mode | Frequency | Severity | Trace | New? |
+|---|---|---|---|---|---|
+| 1 | **Chunk-boundary group bleed.** The chunker repeats text across a boundary, so chunk_57 opens with the tail of the *technical* outstation rule (₹1000) then switches to the non-technical section. Naive group tags put it under non-technical: technical callers lose the rule, non-technical callers are told ₹500. | Retrieval check: technical miss **10/10**, non-technical bleed **8/8**. Pre-fix suite: G06, G07, G09 failed (3 of the 13 valid cases). After fix: 0/10, 0/8 | **High** (wrong pay figure, or none) | `tr_625df6fe1693` (G07, budget exhausted looking for ₹1000), `tr_19b882d70271` (G09, ₹500 told to non-technical) | **NEW** (group filter × chunker) |
+| 2 | **Null `employee_group` rejected.** Code forces the group, but the schema still showed the parameter to the model. For unresolved callers it sent `null`; Groq's validator rejects it with HTTP 400 and the user got the fallback text. | **4/30 = 13%** (L01, L05, N01, N02). After: N01 and L05 re-ran clean; L01/N02 not validly re-run (quota) | **High** (no answer) | `tr_6859a1b5d50f` (L01) | **NEW** (group scoping × tool schema × provider validation) |
+| 3 | **Guard overwrites a correct answer.** The revision guard treated "Revisions 9 and 10" as a latest-revision question (regex missed the plural) and replaced the correct "May 2023" answer. | 1/30 = 3% | **High** (a correct answer replaced by an answer to a different question) | `tr_fe1d13d95a05` (R03) | **NEW** (guard × agent) |
+| 4 | **Grounding-guard false positive.** A correct answer gets "Not verified: 9.5" because the handbook says "9.30 hours", or "56"/"17, 19" because the model wrote "chunk 56" / "chunks 17 and 19". | 2/30 = 7% in the run (G04, G06); a third (L05) appeared later | Low (noise, answer is right) | `tr_9bd3bc5491b0` (G04) | Inherited, amplified by integration |
+| 5 | **Derived figure not in the handbook.** The model adds its own arithmetic ("about 75 days" = 30 + 45; the handbook says up to 2 months). The guard flags it, the judge calls it supported. | 1/30 = 3% | Medium (a plausible wrong duration) | `tr_4df587dcff84` (L08) | Inherited |
+| 6 | **Unsupported added claim.** Assertions pass, but the answer adds "any remaining unused days are forfeited" (G03) or cites a tool key as a handbook section (L02). Found only by reading against evidence. | 2/28 = 7% | Low-Medium | `tr_6cbe7714e2ba` (G03), `tr_008946e8329e` (L02) | Inherited |
+| 7 | **"Not covered" without looking.** The agent answered N03 with zero tool calls. The assertion passed (right words) but it never searched. | 1/28 = 4% | Medium (a refusal that happens to be right) | `tr_5046205dac85` (N03) | Inherited (Week 8 trajectory) |
+
+Not a system mode, but it corrupted measurement: the Groq free tier allows 200,000 tokens/day. The first baseline lost 18 results to it, and today's re-run lost L01 and N02. These rows are excluded and labelled, not counted as failures.
+
+**Trace actually read:** `tr_625df6fe1693` (G07). The agent called `search_handbook` three times, got chunk_56 each time (which ends mid-sentence at "travel outstation") and never saw ₹1000, because chunk_57 was tagged non-technical and filtered out. It hit the 12,000-token budget. Same root cause as mode 1; the cost blow-up (≈12k tokens vs ≈4k when the rule is findable) is a side effect.

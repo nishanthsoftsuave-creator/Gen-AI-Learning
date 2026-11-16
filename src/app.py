@@ -1,6 +1,8 @@
 import json
+import logging
 import shutil
 import sys
+import time
 from pathlib import Path
 
 SRC_DIR = Path(__file__).resolve().parent
@@ -13,9 +15,9 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from agentic_bridge import run_agent, run_workflow
+from agentic_bridge import run_agent, run_normal_workflow, run_multi_agent
 from rag import retrieve_documents, generate_answer, GROQ_MODEL
-from tracing import create_trace_id, save_trace
+from tracing import build_spans, create_trace_id, save_trace
 from vector_store import store_embeddings
 
 
@@ -27,6 +29,7 @@ STATUS_FILE = UPLOAD_DIR / "status.json"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 app = FastAPI(title="RAG Document Q&A")
+logger = logging.getLogger(__name__)
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,6 +48,7 @@ if (FRONTEND_DIST_DIR / "assets").exists():
 
 class QuestionRequest(BaseModel):
     question: str
+    user_ref: str | None = None  # hashed employee id; never a raw name
 
 
 class CompareRequest(BaseModel):
@@ -150,7 +154,9 @@ def ask_question(payload: QuestionRequest):
             detail="Upload a PDF document before asking a question.",
         )
 
+    retrieval_started = time.perf_counter()
     documents = retrieve_documents(question)
+    retrieval_seconds = time.perf_counter() - retrieval_started
 
     if not documents:
         raise HTTPException(
@@ -159,9 +165,10 @@ def ask_question(payload: QuestionRequest):
         )
 
      # Generate answer and capture metadata needed for tracing.
-    answer, prompt, temperature = generate_answer(
+    answer, prompt, temperature, usage = generate_answer(
         question,
         documents,
+        include_usage=True,
     )
 
     # Create and save a trace for this API request.
@@ -175,6 +182,8 @@ def ask_question(payload: QuestionRequest):
         model=GROQ_MODEL,
         temperature=temperature,
         raw_output=answer,
+        user_ref=payload.user_ref,
+        spans=build_spans(GROQ_MODEL, retrieval_seconds, usage),
     )
 
     # API response must contain only the answer string for the frontend
@@ -193,7 +202,13 @@ def _serialize_run(result):
         "answer": result["answer"],
         "iterations": result["iterations"],
         "tool_calls": [
-            {"tool": call["tool"], "arguments": call["arguments"]}
+            {
+                "tool": call["tool"],
+                "arguments": call.get(
+                    "arguments",
+                    {key: call[key] for key in ("worker", "task") if key in call},
+                ),
+            }
             for call in result["tool_calls"]
         ],
         "input_tokens": result["input_tokens"],
@@ -206,34 +221,43 @@ def _serialize_run(result):
     }
 
 
-def _pick_winner(agent_result, workflow_result):
-    """Efficiency-only comparison (completion, tokens, cost) -- this is
-    NOT a correctness/accuracy judgment. Free-form UI questions have no
-    ground-truth answer to grade against (unlike the fixed 10-question
-    race in Agentic Ai/race_questions.json), so the UI must not claim to
-    know which answer is more *correct*, only which run cost less."""
+def _pick_winner(runs):
+    """Compare efficiency only; this does not grade answer correctness."""
+    clean_runs = [run for run in runs if run["termination_reason"] == "COMPLETED"]
+    if not clean_runs:
+        return {"winner": None, "reason": "All workflows failed; check the backend terminal for details."}
+    candidates = clean_runs or runs
+    winner = min(candidates, key=lambda run: (run["cost"], run["total_tokens"], run["elapsed_seconds"]))
+    failed = [run for run in runs if run["termination_reason"] != "COMPLETED"]
+    reason = (
+        f"the other run(s) did not finish cleanly ({', '.join(run['termination_reason'] for run in failed)})"
+        if failed and winner in clean_runs
+        else "lowest cost among completed runs" if clean_runs
+        else "lowest cost among runs that did not complete"
+    )
+    return {"winner": winner["system"], "reason": reason}
 
-    agent_clean = agent_result["termination_reason"] == "COMPLETED"
-    workflow_clean = workflow_result["termination_reason"] == "COMPLETED"
 
-    if agent_clean != workflow_clean:
-        winner = "agent" if agent_clean else "workflow"
-        loser_reason = workflow_result if winner == "agent" else agent_result
+def _run_workflow_safely(workflow_name, runner, question):
+    try:
+        return runner(question, question_id="ui")
+    except Exception:
+        logger.exception("Workflow '%s' failed while comparing answers", workflow_name)
         return {
-            "winner": winner,
-            "reason": f"the other run did not finish cleanly ({loser_reason['termination_reason']})",
+            "system": workflow_name,
+            "question_id": "ui",
+            "question": question,
+            "answer": "This workflow failed. Check the backend terminal for the error details.",
+            "iterations": 0,
+            "tool_calls": [],
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "total_tokens": 0,
+            "cost": 0.0,
+            "elapsed_seconds": 0.0,
+            "termination_reason": "ERROR",
+            "trace_id": None,
         }
-
-    if agent_result["cost"] != workflow_result["cost"]:
-        winner = "agent" if agent_result["cost"] < workflow_result["cost"] else "workflow"
-        return {"winner": winner, "reason": "lower cost for this question"}
-
-    if agent_result["total_tokens"] != workflow_result["total_tokens"]:
-        winner = "agent" if agent_result["total_tokens"] < workflow_result["total_tokens"] else "workflow"
-        return {"winner": winner, "reason": "fewer total tokens for this question"}
-
-    winner = "agent" if agent_result["elapsed_seconds"] < workflow_result["elapsed_seconds"] else "workflow"
-    return {"winner": winner, "reason": "lower latency for this question"}
 
 
 @app.post("/agentic/compare")
@@ -243,12 +267,14 @@ def agentic_compare(payload: CompareRequest):
     if not question:
         raise HTTPException(status_code=400, detail="Please enter a question.")
 
-    agent_result = run_agent(question, question_id="ui")
-    workflow_result = run_workflow(question, question_id="ui")
+    normal_result = _run_workflow_safely("normal_workflow", run_normal_workflow, question)
+    agent_result = _run_workflow_safely("agent", run_agent, question)
+    multi_agent_result = _run_workflow_safely("multi_agent", run_multi_agent, question)
 
     return {
         "question": question,
+        "normal_workflow": _serialize_run(normal_result),
         "agent": _serialize_run(agent_result),
-        "workflow": _serialize_run(workflow_result),
-        "verdict": _pick_winner(agent_result, workflow_result),
+        "multi_agent": _serialize_run(multi_agent_result),
+        "verdict": _pick_winner([normal_result, agent_result, multi_agent_result]),
     }

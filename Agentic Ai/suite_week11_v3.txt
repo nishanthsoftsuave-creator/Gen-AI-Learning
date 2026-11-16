@@ -1,0 +1,18 @@
+﻿# Week 11 suite, HR handbook (4 cases)
+
+## RED: before the fix (replays logged/planted answers)
+FAIL HR-REV-001
+PASS HR-REV-002-legacy
+FAIL HR-LEAVE-001
+PASS HR-LEAVE-002-nontech
+SUITE BEFORE: 2/4 passed
+
+## GREEN: after the fix (HR-REV via guard; HR-LEAVE-* run live on prompt rag_v3)
+PASS HR-REV-001
+PASS HR-REV-002-legacy
+PASS HR-LEAVE-001
+PASS HR-LEAVE-002-nontech
+SUITE AFTER: 4/4 passed
+
+Summary: 2/4 -> 4/4
+

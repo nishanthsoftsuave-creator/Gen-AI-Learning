@@ -26,7 +26,7 @@ export default function Header({ status, view, onChangeView }) {
         <div className="brand-text">
           <span className="brand-name">Handbook Registry</span>
           <span className="brand-tagline">
-            {view === "race" ? "Agent vs. workflow comparison" : "Document Q&A"}
+            {view === "race" ? "Compare answer workflows" : "Document Q&A"}
           </span>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function Header({ status, view, onChangeView }) {
           onClick={() => onChangeView("race")}
         >
           <span className="header-tab-index">02</span>
-          Agent vs Workflow
+          Compare Workflows
         </button>
       </nav>
 

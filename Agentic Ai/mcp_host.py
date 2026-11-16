@@ -14,6 +14,7 @@ call lives in the agent/host layer (``agent.py`` / ``llm_client.py``).
 """
 
 import atexit
+import contextvars
 import json
 import os
 import queue
@@ -25,8 +26,15 @@ from itertools import count
 from pathlib import Path
 
 AGENTIC_DIR = Path(__file__).resolve().parent
-DEFAULT_CONFIG_PATH = AGENTIC_DIR / "mcp_config.json"
+# HR_MCP_CONFIG lets the capstone entry point discover only the handbook server.
+DEFAULT_CONFIG_PATH = Path(os.environ.get("HR_MCP_CONFIG") or AGENTIC_DIR / "mcp_config.json")
 TRACE_PATH = AGENTIC_DIR / "output" / "mcp_trace.jsonl"
+
+sys.path.insert(0, str(AGENTIC_DIR.parent / "src"))
+from redact import redact_obj  # noqa: E402
+
+# Set by the entry point per request; sent to the server as params._meta.trace_id.
+TRACE_ID = contextvars.ContextVar("mcp_trace_id", default=None)
 
 PROTOCOL_VERSION = "2025-06-18"
 INITIALIZE_TIMEOUT_SECONDS = 120
@@ -59,7 +67,7 @@ def _trace(direction, server_key, payload):
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime()),
         "server": server_key,
         "direction": direction,
-        "payload": payload,
+        "payload": redact_obj(payload),  # arguments can carry pasted secrets
     }
     try:
         TRACE_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -355,11 +363,10 @@ def call_tool(name, arguments):
     conn = _OWNERS.get(name)
     if conn is None:
         raise MCPTransportError(f"no discovered MCP server provides tool '{name}'")
-    response = conn.request(
-        "tools/call",
-        {"name": name, "arguments": arguments},
-        TOOLS_CALL_TIMEOUT_SECONDS,
-    )
+    params = {"name": name, "arguments": arguments}
+    if TRACE_ID.get():
+        params["_meta"] = {"trace_id": TRACE_ID.get()}
+    response = conn.request("tools/call", params, TOOLS_CALL_TIMEOUT_SECONDS)
     if "error" in response:
         error = response.get("error") or {}
         raise MCPTransportError(

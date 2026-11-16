@@ -5,10 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/status": "http://127.0.0.1:8000",
-      "/upload": "http://127.0.0.1:8000",
-      "/ask": "http://127.0.0.1:8000",
-      "/agentic": "http://127.0.0.1:8000",
+      "/status": "http://127.0.0.1:8002",
+      "/upload": "http://127.0.0.1:8002",
+      "/ask": "http://127.0.0.1:8002",
+      "/agentic": "http://127.0.0.1:8002",
     },
   },
   build: {

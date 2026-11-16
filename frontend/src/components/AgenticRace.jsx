@@ -17,13 +17,16 @@ function formatLatency(seconds) {
   return seconds >= 10 ? `${seconds.toFixed(1)}s` : `${Math.round(seconds * 1000)}ms`;
 }
 
-function SystemPanel({ label, system, run, isWinner }) {
+function SystemPanel({ label, description, system, run, isWinner }) {
   const clean = run.termination_reason === "COMPLETED";
 
   return (
     <div className={`race-panel race-panel-${system}${isWinner ? " winner" : ""}`}>
       <div className="race-panel-head">
-        <span className="race-panel-label">{label}</span>
+        <div className="race-panel-title">
+          <span className="race-panel-label">{label}</span>
+          <span className="race-panel-description">{description}</span>
+        </div>
         {isWinner && <span className="race-panel-crown">More efficient</span>}
         <span className={`race-status-badge${clean ? " ok" : " warn"}`}>
           {clean ? "completed" : run.termination_reason.replace(/_/g, " ").toLowerCase()}
@@ -70,32 +73,46 @@ function SystemPanel({ label, system, run, isWinner }) {
 }
 
 function RaceResult({ entry }) {
-  const winnerLabel = entry.verdict.winner === "agent" ? "Dynamic Agent" : "Fixed Workflow";
+  const winnerLabel = {
+    normal_workflow: "Normal Workflow",
+    agent: "Agent Workflow",
+    multi_agent: "Multi-Agent Workflow",
+  }[entry.verdict.winner];
 
   return (
     <div className="race-result">
       <div className="race-question">{entry.question}</div>
 
-      <div className={`race-verdict ${entry.verdict.winner}`}>
-        <strong>{winnerLabel}</strong> was more efficient here — {entry.verdict.reason}.
-        <span className="race-verdict-caveat">
+      <div className={`race-verdict ${entry.verdict.winner || "none"}`}>
+        <strong>{winnerLabel || "Comparison unavailable"}</strong>
+        {winnerLabel ? " was more efficient here — " : ": "}{entry.verdict.reason}.
+        {winnerLabel && <span className="race-verdict-caveat">
           {" "}
-          (efficiency only — read both answers below to judge accuracy yourself)
-        </span>
+          (efficiency only — read all three answers below to judge accuracy yourself)
+        </span>}
       </div>
 
       <div className="race-columns">
         <SystemPanel
-          label="Dynamic Agent"
+          label="Normal Workflow"
+          description="Hybrid search retrieves relevant PDF passages, then one model call answers."
+          system="normal"
+          run={entry.normal_workflow}
+          isWinner={entry.verdict.winner === "normal_workflow"}
+        />
+        <SystemPanel
+          label="Agent Workflow"
+          description="One agent chooses handbook tools and decides when it has enough evidence."
           system="agent"
           run={entry.agent}
           isWinner={entry.verdict.winner === "agent"}
         />
         <SystemPanel
-          label="Fixed Workflow"
-          system="workflow"
-          run={entry.workflow}
-          isWinner={entry.verdict.winner === "workflow"}
+          label="Multi-Agent Workflow"
+          description="A coordinator delegates to focused handbook specialists, then combines results."
+          system="multi-agent"
+          run={entry.multi_agent}
+          isWinner={entry.verdict.winner === "multi_agent"}
         />
       </div>
     </div>
@@ -118,8 +135,22 @@ export default function AgenticRace() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Comparison failed.");
+      const responseText = await res.text();
+      let data;
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        const message = res.status >= 500
+          ? `Server error (HTTP ${res.status}). Check the backend terminal for details.`
+          : `Unexpected response from the server (HTTP ${res.status}).`;
+        throw new Error(message);
+      }
+      if (!res.ok) {
+        const detail = Array.isArray(data.detail)
+          ? data.detail.map((item) => item.msg).join("; ")
+          : data.detail;
+        throw new Error(detail || `Comparison failed (HTTP ${res.status}).`);
+      }
 
       setResults((prev) => [{ id: nextRaceId++, ...data }, ...prev]);
     } catch (err) {
@@ -141,14 +172,13 @@ export default function AgenticRace() {
     <div className="race-view">
       <div className="race-intro">
         <p>
-          Ask a question about the <strong>Soft Suave Employee Handbook</strong> (policies,
-          contacts, revision history). It runs on <strong>both</strong> a dynamic tool-calling
-          agent and a fixed, hard-coded pipeline, so you can compare what each one costs and
-          produces.
+          <strong>Compare three ways to answer the same handbook question.</strong> The normal
+          workflow uses the app's PDF retrieval pipeline. The agent chooses tools dynamically.
+          The multi-agent workflow delegates to specialists and combines their findings.
         </p>
         <p className="race-hint">
-          Both systems share a Groq rate limit. A comparison usually takes 20–60 seconds, but can
-          take much longer if that shared limit is currently exhausted.
+          Results show the answer, time, token use, and estimated model cost for each workflow.
+          The efficiency marker compares cost; it does not grade answer accuracy.
         </p>
         <div className="race-examples">
           {EXAMPLE_QUESTIONS.map((q) => (
@@ -168,13 +198,13 @@ export default function AgenticRace() {
       <form className="race-form" onSubmit={handleSubmit}>
         <input
           type="text"
-          placeholder="e.g. What happens if I raise a grievance, and how is it resolved?"
+          placeholder="Ask about a handbook policy, contact, or revision…"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           disabled={running}
         />
         <button type="submit" disabled={running || !value.trim()}>
-          {running ? "Running both…" : "Compare"}
+          {running ? "Comparing…" : "Compare workflows"}
         </button>
       </form>
 
@@ -187,7 +217,7 @@ export default function AgenticRace() {
             <span></span>
             <span></span>
           </div>
-          Running the agent and the workflow…
+          Running all three workflows…
         </div>
       )}
 

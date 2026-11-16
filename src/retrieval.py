@@ -48,7 +48,7 @@ def _reciprocal_rank_fusion(ranked_id_lists, k=RRF_K):
     return sorted(scores, key=scores.get, reverse=True)
 
 
-def _rerank(question, candidate_ids, id_to_document, top_k):
+def _rerank(question, candidate_ids, id_to_document, top_k, id_to_source=None):
     if not candidate_ids:
         return []
 
@@ -67,6 +67,7 @@ def _rerank(question, candidate_ids, id_to_document, top_k):
                 "chunk_id": doc_id,
                 "score": float(score),
                 "text": id_to_document[doc_id],
+                "source_file": (id_to_source or {}).get(doc_id),
             }
         )
 
@@ -83,7 +84,7 @@ def hybrid_retrieve(collection, question, question_embedding, top_k=3, where=Non
     if collection.count() == 0:
         return []
 
-    get_kwargs = {"include": ["documents"]}
+    get_kwargs = {"include": ["documents", "metadatas"]}
     if where:
         get_kwargs["where"] = where
     all_data = collection.get(**get_kwargs)
@@ -93,10 +94,15 @@ def hybrid_retrieve(collection, question, question_embedding, top_k=3, where=Non
         return []
 
     id_to_document = dict(zip(all_ids, all_documents))
+    # Indexes built before source_file existed have None metadata.
+    id_to_source = {
+        doc_id: (metadata or {}).get("source_file")
+        for doc_id, metadata in zip(all_ids, all_data["metadatas"])
+    }
 
     dense_ids = _dense_search(collection, question_embedding, CANDIDATES_PER_RETRIEVER, where=where)
     sparse_ids = _sparse_search(all_ids, all_documents, question, CANDIDATES_PER_RETRIEVER)
 
     fused_ids = _reciprocal_rank_fusion([dense_ids, sparse_ids])
 
-    return _rerank(question, fused_ids, id_to_document, top_k)
+    return _rerank(question, fused_ids, id_to_document, top_k, id_to_source)

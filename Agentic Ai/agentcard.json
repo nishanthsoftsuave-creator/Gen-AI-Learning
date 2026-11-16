@@ -1,0 +1,64 @@
+{
+  "name": "Soft Suave HR Handbook Orchestrator",
+  "description": "Coordinates handbook policy-content and document revision-history workers.",
+  "url": "http://127.0.0.1:8000/a2a",
+  "version": "1.0.0",
+  "protocolVersion": "1.0.0",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false
+  },
+  "defaultInputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "text/plain",
+    "application/json"
+  ],
+  "securitySchemes": {},
+  "skills": [
+    {
+      "id": "handbook-policy-content",
+      "name": "Handbook policy and procedure lookup",
+      "description": "Find and explain policy text, procedures, contacts, and consequences from the Employee Handbook.",
+      "tags": [
+        "HR",
+        "handbook",
+        "policy",
+        "procedure"
+      ],
+      "examples": [
+        "What are the disciplinary consequences in the Handbook?"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain",
+        "application/json"
+      ]
+    },
+    {
+      "id": "handbook-revision-history",
+      "name": "Handbook document revision history",
+      "description": "Return the Handbook document's revision count, dates, and modification clause.",
+      "tags": [
+        "HR",
+        "handbook",
+        "revision history"
+      ],
+      "examples": [
+        "When was the latest Handbook revision?"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain",
+        "application/json"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "system": "agent",
+    "question_id": "Q1",
+    "passed": true,
+    "latency_ms": 3358.0,
+    "input_tokens": 3530,
+    "output_tokens": 265,
+    "total_tokens": 3795,
+    "cost": 0.00034425,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q1",
+    "passed": true,
+    "latency_ms": 4994.9,
+    "input_tokens": 3209,
+    "output_tokens": 563,
+    "total_tokens": 3772,
+    "cost": 0.000409575,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q2",
+    "passed": true,
+    "latency_ms": 3500.9,
+    "input_tokens": 1684,
+    "output_tokens": 625,
+    "total_tokens": 2309,
+    "cost": 0.0003138,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q2",
+    "passed": true,
+    "latency_ms": 27556.9,
+    "input_tokens": 3339,
+    "output_tokens": 476,
+    "total_tokens": 3815,
+    "cost": 0.000393225,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q3",
+    "passed": true,
+    "latency_ms": 29988.7,
+    "input_tokens": 3373,
+    "output_tokens": 599,
+    "total_tokens": 3972,
+    "cost": 0.000432675,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q3",
+    "passed": true,
+    "latency_ms": 59951.0,
+    "input_tokens": 6639,
+    "output_tokens": 1125,
+    "total_tokens": 7764,
+    "cost": 0.000835425,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q4",
+    "passed": true,
+    "latency_ms": 139488.5,
+    "input_tokens": 15442,
+    "output_tokens": 3194,
+    "total_tokens": 18636,
+    "cost": 0.00211635,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q4",
+    "passed": true,
+    "latency_ms": 33412.2,
+    "input_tokens": 3625,
+    "output_tokens": 859,
+    "total_tokens": 4484,
+    "cost": 0.000529575,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q5",
+    "passed": true,
+    "latency_ms": 50822.7,
+    "input_tokens": 5787,
+    "output_tokens": 420,
+    "total_tokens": 6207,
+    "cost": 0.000560025,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q5",
+    "passed": true,
+    "latency_ms": 48453.8,
+    "input_tokens": 6393,
+    "output_tokens": 698,
+    "total_tokens": 7091,
+    "cost": 0.000688875,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q6",
+    "passed": false,
+    "latency_ms": 64515.5,
+    "input_tokens": 8605,
+    "output_tokens": 580,
+    "total_tokens": 9185,
+    "cost": 0.000819375,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q6",
+    "passed": false,
+    "latency_ms": 89586.0,
+    "input_tokens": 12613,
+    "output_tokens": 530,
+    "total_tokens": 13143,
+    "cost": 0.001104975,
+    "termination_reason": "MAX_TOKENS_EXCEEDED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q7",
+    "passed": true,
+    "latency_ms": 29312.9,
+    "input_tokens": 3565,
+    "output_tokens": 400,
+    "total_tokens": 3965,
+    "cost": 0.000387375,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q7",
+    "passed": true,
+    "latency_ms": 13821.7,
+    "input_tokens": 2789,
+    "output_tokens": 885,
+    "total_tokens": 3674,
+    "cost": 0.000474675,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q8",
+    "passed": true,
+    "latency_ms": 58060.5,
+    "input_tokens": 5773,
+    "output_tokens": 3513,
+    "total_tokens": 9286,
+    "cost": 0.001486875,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q8",
+    "passed": true,
+    "latency_ms": 35761.6,
+    "input_tokens": 3367,
+    "output_tokens": 468,
+    "total_tokens": 3835,
+    "cost": 0.0003929249999999999,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q9",
+    "passed": true,
+    "latency_ms": 66727.4,
+    "input_tokens": 8000,
+    "output_tokens": 625,
+    "total_tokens": 8625,
+    "cost": 0.0007875,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q9",
+    "passed": true,
+    "latency_ms": 31021.7,
+    "input_tokens": 3803,
+    "output_tokens": 984,
+    "total_tokens": 4787,
+    "cost": 0.000580425,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "orchestrator",
+    "question_id": "Q10",
+    "passed": true,
+    "latency_ms": 34944.7,
+    "input_tokens": 4376,
+    "output_tokens": 653,
+    "total_tokens": 5029,
+    "cost": 0.0005241,
+    "termination_reason": "COMPLETED"
+  },
+  {
+    "system": "agent",
+    "question_id": "Q10",
+    "passed": true,
+    "latency_ms": 50967.2,
+    "input_tokens": 6337,
+    "output_tokens": 551,
+    "total_tokens": 6888,
+    "cost": 0.000640575,
+    "termination_reason": "COMPLETED"
+  }
+]
